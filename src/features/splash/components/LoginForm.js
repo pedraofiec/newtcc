@@ -22,7 +22,7 @@ const LoginForm = () => {
         backgroundPosition: 'center',
       }}
     >
-      {/* O formulário agora está em uma camada acima do overlay */}
+      {/* O formulário agora está em uma camada acima do overlayy */}
       <div
         className={`w-full max-w-sm p-8 bg-[#A1E3F4] rounded-2xl shadow-2xl form-container is-visible z-10`}
       >
