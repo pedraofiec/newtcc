@@ -3,7 +3,8 @@ import React from 'react';
 import { FaUser } from 'react-icons/fa6'; 
 import './LoginForm.css';
 
-const LoginForm = () => {
+// Adicione a prop 'onRegisterClick'
+const LoginForm = ({ onRegisterClick }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -15,8 +16,7 @@ const LoginForm = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#A1E3F4] p-4 relative overflow-hidden">
-      {/* A parte de cima (cabeçalho) foi removida daqui */}
-
+      {/* O resto do seu código permanece o mesmo */}
       <div
         className={`w-full max-w-sm p-8 bg-[#A1E3F4] rounded-2xl shadow-2xl mt-16`}
       >
@@ -50,7 +50,10 @@ const LoginForm = () => {
         </form>
 
         <div className="text-center mt-6 text-gray-700">
-          <a href="#" className="block text-sm font-medium hover:underline mb-1">Criar conta</a>
+          {/* Adicione o onClick para chamar a prop */}
+          <a href="#" onClick={onRegisterClick} className="block text-sm font-medium hover:underline mb-1">
+            Criar conta
+          </a>
           <a href="#" className="block text-sm font-medium hover:underline">Esqueceu a senha?</a>
         </div>
       </div>
