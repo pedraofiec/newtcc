@@ -1,0 +1,50 @@
+/* src/features/cadastro/components/animation.css */
+
+/* Estado inicial (invisível e fora de posição) */
+.form-container {
+  opacity: 0;
+  transform: translateY(-50px) scale(0.9);
+  transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Estado final (visível e na posição correta) */
+.form-container.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Estilos de input comuns para todos os formulários */
+.input-field {
+  width: 100%;
+  padding: 0.75rem; /* p-3 */
+  border-radius: 0.375rem; /* rounded-md */
+  border: 1px solid #d1d5db; /* border-gray-300 */
+  background-color: #e5e7eb; /* bg-gray-200 */
+  color: #1f2937; /* text-gray-800 */
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+  border-color: #3b82f6; /* focus:border-blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* focus:ring-2 focus:ring-blue-500 */
+}
+
+/* Estilos de botão comuns */
+.submit-button {
+  width: 100%;
+  padding: 0.75rem 0; /* py-3 */
+  margin-top: 1rem; /* mt-4 */
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600; /* font-semibold */
+  color: white;
+  background-color: #4DD0E1; /* cor principal */
+  border-radius: 9999px; /* rounded-full */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.3s ease-in-out;
+}
+
+.submit-button:hover {
+  background-color: #34A4B5; /* hover:bg-[#34A4B5] */
+}
