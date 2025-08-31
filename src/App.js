@@ -6,47 +6,24 @@ import RegisterResponsible from './features/cadastro/components/RegisterResponsi
 import RegisterDriver from './features/cadastro/components/RegisterDriver';
 import RegisterSchool from './features/cadastro/components/RegisterSchool';
 import RegisterStudent from './features/cadastro/components/RegisterStudent';
+import SplashScreen from './features/splash/SplashScreen';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
-  const [currentView, setCurrentView] = useState('login');
-
-  const showUserTypeSelection = (e) => {
-    e.preventDefault();
-    setCurrentView('userType');
-  };
-
-  const showRegisterResponsible = () => {
-    setCurrentView('registerResponsible');
-  };
-
-  const showRegisterDriver = () => {
-    setCurrentView('registerDriver');
-  };
   
-  const showRegisterSchool = () => {
-    setCurrentView('registerSchool');
-  };
-
-  const showRegisterStudent = () => {
-    setCurrentView('registerStudent');
-  };
 
   return (
     <div className="App">
-      {currentView === 'login' && <LoginForm onRegisterClick={showUserTypeSelection} />}
-      {currentView === 'userType' && (
-        <UserTypeSelection
-          onSelectResponsible={showRegisterResponsible}
-          onSelectDriver={showRegisterDriver}
-          onSelectSchool={showRegisterSchool}
-        />
-      )}
-      {currentView === 'registerResponsible' && (
-        <RegisterResponsible onRegisterStudent={showRegisterStudent} />
-      )}
-      {currentView === 'registerDriver' && <RegisterDriver />}
-      {currentView === 'registerSchool' && <RegisterSchool />}
-      {currentView === 'registerStudent' && <RegisterStudent />}
+      <Router>
+        <Routes>
+          <Route path="/" element={<SplashScreen />} />
+          <Route path="/register" element={<UserTypeSelection />} />
+          <Route path="/register/responsible" element={<RegisterResponsible />} />
+          <Route path="/register/driver" element={<RegisterDriver />} />
+          <Route path="/register/school" element={<RegisterSchool />} />
+          <Route path="/register/student" element={<RegisterStudent />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
