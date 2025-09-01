@@ -11,7 +11,7 @@ const SplashScreen = () => {
       }}
     >
       {/* Overlay com opacidade de 0.5 */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      <div className="absolute inset-0 bg-black opacity-20"></div>
 
       {/* Formulário sobreposto com z-index para ficar acima do overlay */}
       <div className="relative z-10 w-full max-w-sm">
