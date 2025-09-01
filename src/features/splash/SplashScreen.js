@@ -1,14 +1,13 @@
-// src/ImageBackgroundForm.js
 import React from 'react';
 import LoginForm from './components/LoginForm';
-
+import Fundo1 from './components/assets/Fundo1.png'; // <-- Importe a imagem
 
 const SplashScreen = () => {
   return (
     <div
       className="relative flex items-center justify-center min-h-screen bg-cover bg-center"
       style={{
-        backgroundImage: `url('https://www.phsoft.com.br/wp-content/uploads/2020/10/controle-estoque.png')`
+        backgroundImage: `url(${Fundo1})` // <-- Use a variável aqui
       }}
     >
       {/* Overlay com opacidade de 0.5 */}

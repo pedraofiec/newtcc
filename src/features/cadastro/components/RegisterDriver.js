@@ -7,6 +7,8 @@ const RegisterDriver = () => {
   const [fullName, setFullName] = React.useState('');
   const [license, setLicense] = React.useState('');
   const [phone, setPhone] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [email, setEmail] = React.useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -42,6 +44,20 @@ const RegisterDriver = () => {
             placeholder="Telefone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
           />
           <button
