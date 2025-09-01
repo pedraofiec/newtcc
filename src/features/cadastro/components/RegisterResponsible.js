@@ -8,10 +8,12 @@ const RegisterResponsible = () => {
   const [cpf, setCpf] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [address, setAddress] = React.useState('');
+  const [email, setEmail] = React.useState(''); // <-- Novo campo de estado
+  const [password, setPassword] = React.useState(''); // <-- Novo campo de estado
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Cadastro de responsável solicitado:', { fullName, cpf, phone, address });
+    console.log('Cadastro de responsável solicitado:', { fullName, cpf, phone, address, email, password }); // <-- Atualizado
     alert('Cadastro de responsável solicitado.');
   };
 
@@ -50,6 +52,20 @@ const RegisterResponsible = () => {
             placeholder="Endereço"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
           />
           <button
