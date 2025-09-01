@@ -22,13 +22,7 @@
                 onClick={() => navigate('/login')}
                 className="rounded-full bg-white/10 px-4 py-1.5 text-sm text-slate-800 hover:bg-white/20"
             >
-                Fazer login
-            </button>
-            <button
-                onClick={() => navigate('/register')}
-                className="rounded-full bg-cyan-500 px-4 py-1.5 text-sm font-semibold text-slate-900 hover:brightness-110"
-            >
-                Criar conta
+                Login / Registrar
             </button>
             </div>
         </div>
