@@ -4,17 +4,13 @@ import { FaUser } from 'react-icons/fa6';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './LoginForm.css';
 import LoginService from '../services/LoginService';
+import Fundo from './assets/Fundo1.png';
 
 // --- SplashScreen (inline) ---
 const SplashScreen = ({ onLogin, onRegister }) => (
-  <div className="min-h-[100dvh] flex items-center justify-center bg-[#A1E3F4] p-6">
-    <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 text-center">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-cyan-100">
-        <span className="text-2xl">🚐</span>
-      </div>
-      <h1 className="text-2xl font-semibold text-slate-800">ROTAVAN</h1>
-      <p className="mt-1 text-slate-600">Rotas escolares com segurança</p>
-
+<div className="flex flex-col items-center justify-center min-h-screen bg-[#8AD7E1] p-8">
+  <div className="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center">
+    <h1 className="text-3xl font-semibold text-gray-800 mb-6">Escolha o que você deseja fazer:</h1>
       <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
         <button
           onClick={onLogin}
@@ -44,17 +40,14 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // /login?redirect=/destino
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/';
 
-  // Permite pular o splash: /login?skipSplash=1
   React.useEffect(() => {
     const skip = new URLSearchParams(location.search).get('skipSplash');
     if (skip === '1') setShowSplash(false);
   }, [location.search]);
 
-  // Se já estiver autenticado, não mostra login/splash
   React.useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) navigate(redirectTo, { replace: true });
@@ -77,7 +70,6 @@ const LoginForm = () => {
     }
   };
 
-  // Primeiro mostra o splash
   if (showSplash) {
     return (
       <SplashScreen
@@ -87,10 +79,18 @@ const LoginForm = () => {
     );
   }
 
-  // Depois, o formulário de login
   return (
-    <div className="min-h-[100dvh] flex slideIn flex-col items-center justify-center bg-[#A1E3F4] p-4">
-      <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-2xl">
+    <div
+      className="relative min-h-[100dvh] flex slideIn flex-col items-center justify-center p-4"
+      style={{
+        backgroundImage: `url(${Fundo})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-white opacity-30"></div>
+
+      <div className="relative w-full max-w-sm p-8 bg-white rounded-2xl shadow-2xl">
         <div className="flex justify-center mb-6">
           <FaUser className="text-8xl text-gray-800" />
         </div>

@@ -18,7 +18,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#A1E3F4] p-4 relative overflow-hidden animate__animated animate__slideInUp">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#8AD7E1] p-4 relative overflow-hidden animate__animated animate__slideInUp">
       <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-2xl mt-16">
         <div className="flex justify-center mb-6">
           <FaLock className="text-8xl text-gray-800" />
