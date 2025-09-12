@@ -41,7 +41,7 @@ const UserTypeSelection = () => {
     '--ring': `calc(var(--ball) + var(--road-width) * 2)`,        // diâmetro externo da rua
     '--centerline': `calc(var(--ball) + var(--road-width))`,      // diâmetro da linha central da rua
     '--speed': vars.speed,
-  } 
+  }
 
   const baseButtonStyle = { opacity: 0, animationFillMode: 'forwards' };
 
@@ -87,26 +87,30 @@ const UserTypeSelection = () => {
         style={{ width: 'var(--ball)', height: 'var(--ball)', zIndex: 2 }}
       />
 
-      {/* VAN girando exatamente no meio da rua */}
+      {/* VAN girando no meio da rua */}
       <div
         className="absolute rounded-full"
         style={{
           width: 'var(--centerline)',
           height: 'var(--centerline)',
           animation: 'spin-slow var(--speed) linear infinite',
+          animationDirection: 'reverse',
           zIndex: 3,
         }}
       >
         <span
-          className="absolute left-1/2 transform -translate-x-1/2 text-4xl select-none"
+          className="absolute left-1/2 transform -translate-x-1/2 select-none"
           role="img"
           aria-label="van"
-          // posiciona a van sobre a faixa (meio da rua):
-          style={{ top: `calc(-1 * var(--dash-band) - 18px)` }} // ajuste fino vertical da van
+          style={{
+            top: `calc(-1 * (var(--road-width) / 2) - 40px)`, // meio da pista
+            fontSize: "80px", // tamanho da van
+          }}
         >
           🚐
         </span>
       </div>
+
 
       {/* Botões no centro */}
       <div className="relative flex flex-wrap justify-center items-center space-x-8 z-10">
