@@ -18,7 +18,7 @@ const RegisterResponsible = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#8AD7E1] p-4 relative overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#4DD0E1] from-0% to-white-500 to-50% p-4 relative overflow-hidden">
       <div className="flex flex-col items-center justify-center p-8 bg-white rounded-2xl shadow-2xl mt-16 form-container is-visible">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">CADASTRO DE RESPONSÁVEL</h2>
         <div className="relative mb-6">

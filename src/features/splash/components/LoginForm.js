@@ -7,28 +7,29 @@ import LoginService from '../services/LoginService';
 import Fundo from './assets/Fundo1.png';
 
 // --- SplashScreen (inline) ---
-const SplashScreen = ({ onLogin, onRegister }) => (
-<div className="flex flex-col items-center justify-center min-h-screen bg-[#8AD7E1] p-8">
-  <div className="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center">
-    <h1 className="text-3xl font-semibold text-gray-800 mb-6">Escolha o que você deseja fazer:</h1>
-      <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-        <button
-          onClick={onLogin}
-          className="rounded-full bg-slate-800 text-white px-6 py-2 hover:brightness-110"
-        >
-          Fazer login
-        </button>
-        <button
-          onClick={onRegister}
-          className="rounded-full bg-cyan-500 text-slate-900 px-6 py-2 font-semibold hover:brightness-110"
-        >
-          Criar conta
-        </button>
+const CreateOrLoginOption = ({ onLogin, onRegister }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen p-8 z-10">
+    
+    {/* A classe 'slideIn' foi adicionada aqui */}
+    <div className="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center z-10 slideIn">
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6">Escolha o que você deseja fazer:</h1>
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={onLogin}
+            className="rounded-full bg-slate-800 text-white px-6 py-2 hover:brightness-110"
+          >
+            Fazer login
+          </button>
+          <button
+            onClick={onRegister}
+            className="rounded-full bg-cyan-500 text-slate-900 px-6 py-2 font-semibold hover:brightness-110"
+          >
+            Criar conta
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 );
-
 const LoginForm = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -72,7 +73,7 @@ const LoginForm = () => {
 
   if (showSplash) {
     return (
-      <SplashScreen
+      <CreateOrLoginOption
         onLogin={() => setShowSplash(false)}
         onRegister={() => navigate('/register')}
       />
@@ -81,14 +82,12 @@ const LoginForm = () => {
 
   return (
     <div
-      className="relative min-h-[100dvh] flex slideIn flex-col items-center justify-center p-4"
+      className="relative min-h-[100dvh] flex slideIn flex-col items-center justify-center p-4 z-100"
       style={{
-        backgroundImage: `url(${Fundo})`,
-        backgroundSize: 'cover',
+       
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-white opacity-30"></div>
 
       <div className="relative w-full max-w-sm p-8 bg-white rounded-2xl shadow-2xl">
         <div className="flex justify-center mb-6">
@@ -140,7 +139,7 @@ const LoginForm = () => {
           </button>
         </form>
 
-        <div className="text-center mt-6 text-gray-700">
+        <div className="text-center mt-6 text-gray-700  z-10">
           <button
             type="button"
             onClick={() => navigate('/register')}
