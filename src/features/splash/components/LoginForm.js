@@ -6,37 +6,17 @@ import './LoginForm.css';
 import LoginService from '../services/LoginService';
 import Fundo from './assets/Fundo1.png';
 
-// --- SplashScreen (inline) ---
-const CreateOrLoginOption = ({ onLogin, onRegister }) => (
-  <div className="flex flex-col items-center justify-center min-h-screen p-8 z-10">
-    
-    {/* A classe 'slideIn' foi adicionada aqui */}
-    <div className="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center z-10 slideIn">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6">Escolha o que você deseja fazer:</h1>
-        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            onClick={onLogin}
-            className="rounded-full bg-slate-800 text-white px-6 py-2 hover:brightness-110"
-          >
-            Fazer login
-          </button>
-          <button
-            onClick={onRegister}
-            className="rounded-full bg-cyan-500 text-slate-900 px-6 py-2 font-semibold hover:brightness-110"
-          >
-            Criar conta
-          </button>
-        </div>
-      </div>
-    </div>
-);
+// O componente CreateOrLoginOption FOI REMOVIDO COMPLETAMENTE.
+// A lógica de showSplash FOI REMOVIDA.
+
 const LoginForm = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [showPass, setShowPass] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState(null);
-  const [showSplash, setShowSplash] = React.useState(true);
+  
+  // O estado showSplash FOI REMOVIDO.
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,14 +24,13 @@ const LoginForm = () => {
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/';
 
-  React.useEffect(() => {
-    const skip = new URLSearchParams(location.search).get('skipSplash');
-    if (skip === '1') setShowSplash(false);
-  }, [location.search]);
-
+  // Verifica se o usuário já está logado e redireciona (Lógica Mantida)
   React.useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token) navigate(redirectTo, { replace: true });
+    if (token) {
+        navigate(redirectTo, { replace: true });
+    }
+    // O useEffect para 'skipSplash' FOI REMOVIDO.
   }, [navigate, redirectTo]);
 
   const handleSubmit = async (event) => {
@@ -60,8 +39,12 @@ const LoginForm = () => {
     setIsSubmitting(true);
 
     try {
+      // Use as credenciais de teste: teste@rotavan.com.br / 123
       const response = await LoginService.login({ email, password });
+      
       localStorage.setItem('accessToken', response.data.accessToken);
+      
+      // Redireciona para a rota protegida após o login
       navigate(redirectTo, { replace: true });
     } catch (e) {
       console.error(e);
@@ -71,15 +54,7 @@ const LoginForm = () => {
     }
   };
 
-  if (showSplash) {
-    return (
-      <CreateOrLoginOption
-        onLogin={() => setShowSplash(false)}
-        onRegister={() => navigate('/register')}
-      />
-    );
-  }
-
+  // RENDERIZAÇÃO: Agora renderiza apenas o formulário de login imediatamente.
   return (
     <div
       className="relative min-h-[100dvh] flex slideIn flex-col items-center justify-center p-4 z-100"
@@ -89,7 +64,8 @@ const LoginForm = () => {
       }}
     >
 
-      <div className="relative w-full max-w-sm p-8 bg-white rounded-2xl shadow-2xl">
+      {/* Formulário de Login (Card central com Glassmorphism) */}
+      <div className="relative w-full max-w-sm p-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-2xl ring-1 ring-white/50">
         <div className="flex justify-center mb-6">
           <FaUser className="text-8xl text-gray-800" />
         </div>
@@ -101,6 +77,7 @@ const LoginForm = () => {
         )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Input Email */}
           <input
             type="email"
             placeholder="Email"
@@ -108,9 +85,10 @@ const LoginForm = () => {
             autoComplete="email"
             autoFocus
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-white/80"
           />
 
+          {/* Input Senha */}
           <div className="relative">
             <input
               type={showPass ? 'text' : 'password'}
@@ -118,7 +96,8 @@ const LoginForm = () => {
               value={password}
               autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 pr-12 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+              // Corrigindo a largura para acomodar o botão 'Mostrar'
+              className="w-full p-3 pr-16 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-white/80"
             />
             <button
               type="button"
@@ -130,6 +109,7 @@ const LoginForm = () => {
             </button>
           </div>
 
+          {/* Botão Entrar */}
           <button
             type="submit"
             disabled={isSubmitting || !email || !password}
@@ -139,7 +119,8 @@ const LoginForm = () => {
           </button>
         </form>
 
-        <div className="text-center mt-6 text-gray-700  z-10">
+        {/* Links de navegação */}
+        <div className="text-center mt-6 text-gray-700">
           <button
             type="button"
             onClick={() => navigate('/register')}
