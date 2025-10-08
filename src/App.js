@@ -13,6 +13,8 @@ import RegisterResponsible from './features/cadastro/components/RegisterResponsi
 import RegisterDriver from './features/cadastro/components/RegisterDriver';
 import RegisterSchool from './features/cadastro/components/RegisterSchool';
 import RegisterStudent from './features/cadastro/components/RegisterStudent';
+import DriverProfile from './features/motorista/components/DriverProfile';
+import DriverScreen from './features/motorista/components/DriverScreen';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
         <Route path="/register/driver" element={<RegisterDriver />} />
         <Route path="/register/school" element={<RegisterSchool />} />
         <Route path="/register/student" element={<RegisterStudent />} />
+        <Route path="/motoristas" element={<DriverScreen />} />
+        <Route path="/motoristas/:id" element={<DriverProfile />} />
       </Routes>
     </div>
   );
