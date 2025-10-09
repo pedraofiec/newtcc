@@ -5,6 +5,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './LoginForm.css';
 import LoginService from '../services/LoginService';
 import Fundo from './assets/Fundo1.png';
+import useUserStore from './features/shared/store/user-store';
+import { jwtDecode } from 'jwt-decode';
 
 // O componente CreateOrLoginOption FOI REMOVIDO COMPLETAMENTE.
 // A lógica de showSplash FOI REMOVIDA.
@@ -20,6 +22,7 @@ const LoginForm = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const {setMe} = useUserStore();
 
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/';
@@ -53,6 +56,29 @@ const LoginForm = () => {
       setIsSubmitting(false);
     }
   };
+
+  const [form,setForm] = React.useState({email: "", password: ''})
+
+    const submitForm = async (e) => {
+        e.preventDefault();
+        
+        // Isso eu pego do backend
+        const responseData = await LoginService.login(form)
+        const receivedTokenFromBackend = responseData.token;
+        localStorage.setItem("accessToken", receivedTokenFromBackend)
+
+        const decodedUser = jwtDecode(receivedTokenFromBackend);
+        // Armazena o token e as informações decodificadas no Zustand
+        setAuthData(receivedTokenFromBackend, decodedUser);
+        console.log('Dados do usuário decodificados e armazenados:', decodedUser);
+        
+        const me = await LoginService.me();
+        setMe(me.tipo, me)
+    
+
+        navigate("/home")
+
+    }
 
   // RENDERIZAÇÃO: Agora renderiza apenas o formulário de login imediatamente.
   return (
