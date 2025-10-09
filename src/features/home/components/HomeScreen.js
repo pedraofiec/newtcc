@@ -46,7 +46,6 @@ const SideBar = ({ openNav, setOpenNav }) => {
   const navigate = useNavigate();
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: MdOutlineDashboard },
-    { name: "Dependentes", path: "/dependentes", icon: FaUsers },
     { name: "Rotas", path: "/rotas", icon: FaMapMarkedAlt },
     { name: "Motoristas", path: "/motoristas", icon: FaCar },
     { name: "Responsáveis", path: "/responsaveis", icon: FaUserCircle },
