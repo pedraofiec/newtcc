@@ -1,6 +1,9 @@
-// src/features/motorista/components/DriverScreen.js
-import React from "react";
+// src/features/rotas/pages/RotasPage.js
+import React, { useMemo, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
+import RouteMap from "../components/RouteMap";
+import { defaultWaypoints } from "../services/route.waypoints";
+
 import {
   FaUserCircle,
   FaSignOutAlt,
@@ -97,8 +100,27 @@ const SideBar = () => {
   );
 };
 
-/* ============== DriverScreen (conteúdo da página) ============== */
-export default function DriverScreen() {
+/* ============== UI auxiliar (pílulas de info) ============== */
+function InfoPill({ label, value }) {
+  return (
+    <div className="px-3 py-1 rounded-full bg-[#d7f5f8] text-[#02343F] text-sm font-medium shadow-sm">
+      <span className="opacity-75 mr-1">{label}:</span>
+      {value}
+    </div>
+  );
+}
+
+/* ============== RotasPage ============== */
+export default function RotasPage() {
+  const [wps] = useState(defaultWaypoints);
+  const kpis = useMemo(
+    () => [
+      { label: "Estimativa", value: "8–12 min" },
+      { label: "Distância", value: "1.8–3.2 km" }
+    ],
+    []
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
       <Header />
@@ -106,43 +128,31 @@ export default function DriverScreen() {
       <div className="flex min-h-screen">
         <SideBar />
 
+        {/* Conteúdo */}
         <main className="flex-1 px-4 pb-16 pt-6 md:px-8 bg-slate-50 lg:ml-60">
-          <div className="mb-6">
+          {/* Título em pílula, como no print */}
+          <div className="mx-auto w-full md:w-[420px] text-center mb-4">
             <div className="inline-block px-8 py-2 rounded-full bg-[#92dbe1] text-[#02343F] font-semibold tracking-wide">
-              Painel do Motorista
+              ROTAS
             </div>
           </div>
 
-          {/* Cards simples – substitua pelo seu conteúdo real */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-2xl bg-white p-5 shadow ring-1 ring-slate-100">
-              <h3 className="font-semibold text-slate-800 mb-2">Status da Rota</h3>
-              <p className="text-sm text-slate-600 mb-4">
-                Nenhuma rota em andamento.
-              </p>
-              <div className="flex gap-2">
-                <NavLink
-                  to="/rotas"
-                  className="px-4 py-2 rounded-lg bg-[#92dbe1] text-[#02343F] font-medium hover:opacity-90"
-                >
-                  Ver Rotas
-                </NavLink>
-                <button className="px-4 py-2 rounded-lg border border-[#92dbe1] text-[#02343F] hover:bg-[#f6fbfc]">
-                  Publicar Disponibilidade
-                </button>
-              </div>
+          {/* Card com Mapa */}
+          <div className="mx-auto w-full md:w-[720px] bg-white rounded-[24px] p-4 shadow">
+            <div className="flex gap-2 mb-3">
+              {kpis.map((k) => (
+                <InfoPill key={k.label} {...k} />
+              ))}
             </div>
 
-            <div className="rounded-2xl bg-white p-5 shadow ring-1 ring-slate-100">
-              <h3 className="font-semibold text-slate-800 mb-2">Solicitações Pendentes</h3>
-              <p className="text-sm text-slate-600">0 solicitações aguardando análise.</p>
-            </div>
+            <RouteMap waypoints={wps} />
 
-            <div className="rounded-2xl bg-white p-5 shadow ring-1 ring-slate-100">
-              <h3 className="font-semibold text-slate-800 mb-2">Veículo</h3>
-              <p className="text-sm text-slate-600">Nenhum veículo cadastrado.</p>
-              <button className="mt-3 px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-700">
-                Cadastrar Veículo
+            <div className="mt-3 flex gap-2">
+              <button className="px-4 py-2 rounded-lg bg-[#92dbe1] text-[#02343F] font-medium hover:opacity-90">
+                Iniciar Rota
+              </button>
+              <button className="px-4 py-2 rounded-lg border border-[#92dbe1] text-[#02343F] hover:bg-[#f6fbfc]">
+                Alternar Paradas
               </button>
             </div>
           </div>
