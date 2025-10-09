@@ -1,5 +1,4 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
 
 // Importa os componentes de cada funcionalidade
 import HomeScreen from './features/home/components/HomeScreen';
@@ -16,6 +15,10 @@ import RegisterStudent from './features/cadastro/components/RegisterStudent';
 import DriverProfile from './features/motorista/components/DriverProfile';
 import DriverScreen from './features/motorista/components/DriverScreen';
 
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RotasPage from './features/rotas/pages/RotasPage';
+
+
 function App() {
   return (
     <div className="App">
@@ -31,6 +34,7 @@ function App() {
         <Route path="/register/student" element={<RegisterStudent />} />
         <Route path="/motoristas" element={<DriverScreen />} />
         <Route path="/motoristas/:id" element={<DriverProfile />} />
+        <Route path="/rotas" element={<RotasPage />} />
       </Routes>
     </div>
   );
