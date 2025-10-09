@@ -5,7 +5,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './LoginForm.css';
 import LoginService from '../services/LoginService';
 import Fundo from './assets/Fundo1.png';
-import useUserStore from './features/shared/store/user-store';
+import useUserStore from '../../shared/store/user-store';
+import useAuthStore from '../../shared/store/auth-store';
 import { jwtDecode } from 'jwt-decode';
 
 // O componente CreateOrLoginOption FOI REMOVIDO COMPLETAMENTE.
@@ -23,6 +24,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const {setMe} = useUserStore();
+  const {setAuthData} = useAuthStore();
 
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/';
