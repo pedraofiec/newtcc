@@ -1,5 +1,5 @@
 // src/features/splash/services/LoginService.js
-import api from "./features/shared/utils/api";
+import api from '../../shared/utils/api';
 
 // Credenciais Falsas para Teste
 const TEST_USER = {
