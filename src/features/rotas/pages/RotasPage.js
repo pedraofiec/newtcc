@@ -1,5 +1,5 @@
 // src/features/rotas/pages/RotasPage.jsx
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useLayoutEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import RouteMap from "../components/RouteMap";
 import { defaultWaypoints } from "../services/route.waypoints";
@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 import { MdOutlineDashboard } from "react-icons/md";
 
-/* ============== Header (mesmo do HomeScreen) ============== */
+/* ============== Header (igual ao HomeScreen) ============== */
 const Header = () => {
   const navigate = useNavigate();
   return (
@@ -52,7 +52,7 @@ const Header = () => {
   );
 };
 
-/* ============== SideBar (idêntico ao do HomeScreen, Opção A) ============== */
+/* ============== SideBar (igual ao HomeScreen, NavLink ativo) ============== */
 const SideBar = () => {
   const navigate = useNavigate();
   const navItems = [
@@ -111,26 +111,47 @@ function InfoPill({ label, value }) {
   );
 }
 
-/* ============== Página de Rotas ============== */
+/* ============== Página de Rotas (compacta, sem scroll) ============== */
 export default function RotasPage() {
-  // Waypoints controlados na página
-  const [wps, setWps] = useState(defaultWaypoints.slice(0, 2)); // origem/destino
+  // Waypoints + resumo
+  const [wps, setWps] = useState(defaultWaypoints.slice(0, 2));
   const [summary, setSummary] = useState({ distanceMeters: 0, durationSeconds: 0 });
 
-  // UI de busca (geocoding)
+  // Busca (geocoding)
   const [originQuery, setOriginQuery] = useState("");
   const [destQuery, setDestQuery] = useState("");
 
-  // Controle de simulação
-  const [simKey, setSimKey] = useState(0);   // toggles para start/stop
+  // Simulação
+  const [simKey, setSimKey] = useState(0);
   const [stopKey, setStopKey] = useState(0);
 
-  // Controle de clique para definir origem/destino no mapa
+  // Clique para definir pontos no mapa
   const [clickMode, setClickMode] = useState(null); // 'origin' | 'destination' | null
 
+  // ===== Altura dinâmica do mapa (para caber sem scroll) =====
+  const headerH = 64;                 // h-16 = 64px
+  const pagePadding = 24;             // padding/margens aproximados
+  const controlsRef = useRef(null);
+  const [mapHeight, setMapHeight] = useState(420);
+
+  useLayoutEffect(() => {
+    function recalc() {
+      const vh = window.innerHeight;
+      const controlsH = controlsRef.current?.getBoundingClientRect().height ?? 140;
+      // reserva header + paddings + folga para botões
+      const reserved = headerH + pagePadding + controlsH + 90;
+      const h = Math.max(320, vh - reserved);
+      setMapHeight(h);
+    }
+    recalc();
+    window.addEventListener("resize", recalc);
+    return () => window.removeEventListener("resize", recalc);
+  }, []);
+
   const fmt = useMemo(() => ({
-    dist: (m) => `${(m/1000).toFixed(1)} km`,
-    dur:  (s) => {
+    dist: (m) => (m ? `${(m / 1000).toFixed(1)} km` : "—"),
+    dur: (s) => {
+      if (!s) return "—";
       const min = Math.round(s / 60);
       if (min < 60) return `${min} min`;
       const h = Math.floor(min / 60);
@@ -140,43 +161,33 @@ export default function RotasPage() {
   }), []);
 
   async function traceBySearch() {
-    try {
-      const [o, d] = await Promise.all([
-        geocodeAddress(originQuery),
-        geocodeAddress(destQuery),
-      ]);
-      if (!o || !d) {
-        alert("Não foi possível localizar um dos endereços. Tente ser mais específico.");
-        return;
-      }
-      setWps([o, d]);
-    } catch (e) {
-      console.error(e);
-      alert("Erro ao consultar endereços.");
+    const [o, d] = await Promise.all([
+      geocodeAddress(originQuery),
+      geocodeAddress(destQuery),
+    ]);
+    if (!o || !d) {
+      alert("Não foi possível localizar um dos endereços. Tente ser mais específico.");
+      return;
     }
+    setWps([o, d]);
+    setClickMode(null);
   }
 
-  function startSimulation() {
-    // Trocar o valor (para o useEffect do RouteMap detectar)
-    setSimKey((v) => v + 1);
-  }
-  function stopSimulation() {
+  function resetAll() {
+    setWps([]);
+    setClickMode(null);
     setStopKey((v) => v + 1);
-  }
-  function resetRoute() {
-    setWps([]); // limpa (você pode voltar ao default se preferir)
+    setOriginQuery("");
+    setDestQuery("");
     setSummary({ distanceMeters: 0, durationSeconds: 0 });
-    setStopKey((v) => v + 1);
   }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
       <Header />
-
       <div className="flex min-h-screen">
         <SideBar />
 
-        {/* Conteúdo */}
         <main className="flex-1 px-4 pb-16 pt-6 md:px-8 bg-slate-50 lg:ml-60">
           {/* Título */}
           <div className="mx-auto w-full md:w-[420px] text-center mb-4">
@@ -185,94 +196,97 @@ export default function RotasPage() {
             </div>
           </div>
 
-          {/* Card */}
-          <div className="mx-auto w-full max-w-[1100px] bg-white rounded-[24px] p-4 md:p-5 shadow">
-            {/* Linha de controles: origem/destino + ações */}
-            <div className="flex flex-col md:flex-row md:items-end gap-3 mb-4">
-              <div className="flex-1">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Origem</label>
-                <input
-                  value={originQuery}
-                  onChange={(e) => setOriginQuery(e.target.value)}
-                  placeholder="Digite um endereço ou clique em 'Definir no mapa'"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
-                />
-                <button
-                  onClick={() => setClickMode(clickMode === "origin" ? null : "origin")}
-                  className={`mt-2 text-xs rounded-full px-3 py-1 border ${
-                    clickMode === "origin"
-                      ? "bg-slate-800 text-white"
-                      : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                  }`}
-                >
-                  {clickMode === "origin" ? "Clique no mapa: escolhendo origem..." : "Definir no mapa"}
-                </button>
-              </div>
+          {/* Card mais estreito */}
+          <div className="mx-auto w-full max-w-[980px] bg-white rounded-[24px] p-4 md:p-5 shadow">
 
-              <div className="flex-1">
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Destino</label>
-                <input
-                  value={destQuery}
-                  onChange={(e) => setDestQuery(e.target.value)}
-                  placeholder="Digite um endereço ou clique em 'Definir no mapa'"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
-                />
-                <button
-                  onClick={() => setClickMode(clickMode === "destination" ? null : "destination")}
-                  className={`mt-2 text-xs rounded-full px-3 py-1 border ${
-                    clickMode === "destination"
-                      ? "bg-slate-800 text-white"
-                      : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                  }`}
-                >
-                  {clickMode === "destination" ? "Clique no mapa: escolhendo destino..." : "Definir no mapa"}
-                </button>
-              </div>
+            {/* Controles (compactados em 1 linha quando couber) */}
+            <div ref={controlsRef} className="mb-3">
+              <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto_auto] md:items-end">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-500 mb-1">Origem</label>
+                  <input
+                    value={originQuery}
+                    onChange={(e) => setOriginQuery(e.target.value)}
+                    placeholder="Digite um endereço ou clique em 'Definir no mapa'"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 h-10"
+                  />
+                  <button
+                    onClick={() => setClickMode(clickMode === "origin" ? null : "origin")}
+                    className={`mt-2 text-xs rounded-full px-3 py-1 border ${
+                      clickMode === "origin"
+                        ? "bg-slate-800 text-white"
+                        : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {clickMode === "origin" ? "Clique no mapa: origem..." : "Definir no mapa"}
+                  </button>
+                </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={traceBySearch}
-                  className="h-10 rounded-lg bg-[#92dbe1] text-[#02343F] px-4 font-medium hover:opacity-90"
-                >
-                  Traçar
-                </button>
-                <button
-                  onClick={resetRoute}
-                  className="h-10 rounded-lg border border-slate-300 text-slate-700 px-4 font-medium hover:bg-slate-50"
-                >
-                  Reset
-                </button>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-500 mb-1">Destino</label>
+                  <input
+                    value={destQuery}
+                    onChange={(e) => setDestQuery(e.target.value)}
+                    placeholder="Digite um endereço ou clique em 'Definir no mapa'"
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 h-10"
+                  />
+                  <button
+                    onClick={() => setClickMode(clickMode === "destination" ? null : "destination")}
+                    className={`mt-2 text-xs rounded-full px-3 py-1 border ${
+                      clickMode === "destination"
+                        ? "bg-slate-800 text-white"
+                        : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {clickMode === "destination" ? "Clique no mapa: destino..." : "Definir no mapa"}
+                  </button>
+                </div>
+
+                <div className="flex gap-2 md:justify-end">
+                  <button
+                    onClick={traceBySearch}
+                    className="h-10 rounded-lg bg-[#92dbe1] text-[#02343F] px-4 font-medium hover:opacity-90"
+                  >
+                    Traçar
+                  </button>
+                  <button
+                    onClick={resetAll}
+                    className="h-10 rounded-lg border border-slate-300 text-slate-700 px-4 font-medium hover:bg-slate-50"
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                <div className="flex gap-2 md:justify-end">
+                  <InfoPill label="Estimativa" value={fmt.dur(summary.durationSeconds)} />
+                  <InfoPill label="Distância" value={fmt.dist(summary.distanceMeters)} />
+                </div>
               </div>
             </div>
 
-            {/* Pílulas com valores REAIS */}
-            <div className="flex gap-2 mb-3">
-              <InfoPill label="Estimativa" value={summary.durationSeconds ? `${(summary.durationSeconds/60).toFixed(0)} min` : "—"} />
-              <InfoPill label="Distância" value={summary.distanceMeters ? `${(summary.distanceMeters/1000).toFixed(1)} km` : "—"} />
-            </div>
-
-            {/* Mapa */}
+            {/* Mapa com altura dinâmica */}
             <RouteMap
               waypoints={wps}
               onWaypointsChange={setWps}
               onSummary={setSummary}
-              height={560}
-              startSim={simKey}   // muda o valor para disparar
-              stopSim={stopKey}   // idem
-              allowClickSet={clickMode} // 'origin' | 'destination' | null
+              onPickDone={() => setClickMode(null)}
+              height={mapHeight}
+              startSim={simKey}
+              stopSim={stopKey}
+              allowClickSet={clickMode}
             />
 
-            {/* Ações de rota */}
-            <div className="mt-4 flex flex-wrap gap-2">
+            {/* Ações */}
+            <div className="mt-3 flex flex-wrap gap-2">
               <button
-                onClick={startSimulation}
+                onClick={() => setSimKey((v) => v + 1)}
                 className="px-4 py-2 rounded-lg bg-[#92dbe1] text-[#02343F] font-medium hover:opacity-90 disabled:opacity-50"
                 disabled={!(wps && wps.length >= 2)}
               >
                 Iniciar Rota
               </button>
               <button
-                onClick={stopSimulation}
+                onClick={() => setStopKey((v) => v + 1)}
                 className="px-4 py-2 rounded-lg border border-[#92dbe1] text-[#02343F] hover:bg-[#f6fbfc]"
               >
                 Parar
