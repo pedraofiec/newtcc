@@ -1,8 +1,9 @@
-// src/features/rotas/pages/RotasPage.js
+// src/features/rotas/pages/RotasPage.jsx
 import React, { useMemo, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import RouteMap from "../components/RouteMap";
 import { defaultWaypoints } from "../services/route.waypoints";
+import { geocodeAddress } from "../services/geocode";
 
 import {
   FaUserCircle,
@@ -100,7 +101,7 @@ const SideBar = () => {
   );
 };
 
-/* ============== UI auxiliar (pílulas de info) ============== */
+/* ============== Pílula de Info ============== */
 function InfoPill({ label, value }) {
   return (
     <div className="px-3 py-1 rounded-full bg-[#d7f5f8] text-[#02343F] text-sm font-medium shadow-sm">
@@ -110,16 +111,63 @@ function InfoPill({ label, value }) {
   );
 }
 
-/* ============== RotasPage ============== */
+/* ============== Página de Rotas ============== */
 export default function RotasPage() {
-  const [wps] = useState(defaultWaypoints);
-  const kpis = useMemo(
-    () => [
-      { label: "Estimativa", value: "8–12 min" },
-      { label: "Distância", value: "1.8–3.2 km" }
-    ],
-    []
-  );
+  // Waypoints controlados na página
+  const [wps, setWps] = useState(defaultWaypoints.slice(0, 2)); // origem/destino
+  const [summary, setSummary] = useState({ distanceMeters: 0, durationSeconds: 0 });
+
+  // UI de busca (geocoding)
+  const [originQuery, setOriginQuery] = useState("");
+  const [destQuery, setDestQuery] = useState("");
+
+  // Controle de simulação
+  const [simKey, setSimKey] = useState(0);   // toggles para start/stop
+  const [stopKey, setStopKey] = useState(0);
+
+  // Controle de clique para definir origem/destino no mapa
+  const [clickMode, setClickMode] = useState(null); // 'origin' | 'destination' | null
+
+  const fmt = useMemo(() => ({
+    dist: (m) => `${(m/1000).toFixed(1)} km`,
+    dur:  (s) => {
+      const min = Math.round(s / 60);
+      if (min < 60) return `${min} min`;
+      const h = Math.floor(min / 60);
+      const r = min % 60;
+      return `${h}h ${r}min`;
+    }
+  }), []);
+
+  async function traceBySearch() {
+    try {
+      const [o, d] = await Promise.all([
+        geocodeAddress(originQuery),
+        geocodeAddress(destQuery),
+      ]);
+      if (!o || !d) {
+        alert("Não foi possível localizar um dos endereços. Tente ser mais específico.");
+        return;
+      }
+      setWps([o, d]);
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao consultar endereços.");
+    }
+  }
+
+  function startSimulation() {
+    // Trocar o valor (para o useEffect do RouteMap detectar)
+    setSimKey((v) => v + 1);
+  }
+  function stopSimulation() {
+    setStopKey((v) => v + 1);
+  }
+  function resetRoute() {
+    setWps([]); // limpa (você pode voltar ao default se preferir)
+    setSummary({ distanceMeters: 0, durationSeconds: 0 });
+    setStopKey((v) => v + 1);
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
@@ -130,30 +178,108 @@ export default function RotasPage() {
 
         {/* Conteúdo */}
         <main className="flex-1 px-4 pb-16 pt-6 md:px-8 bg-slate-50 lg:ml-60">
-          {/* Título em pílula, como no print */}
+          {/* Título */}
           <div className="mx-auto w-full md:w-[420px] text-center mb-4">
             <div className="inline-block px-8 py-2 rounded-full bg-[#92dbe1] text-[#02343F] font-semibold tracking-wide">
               ROTAS
             </div>
           </div>
 
-          {/* Card com Mapa */}
-          <div className="mx-auto w-full md:w-[720px] bg-white rounded-[24px] p-4 shadow">
-            <div className="flex gap-2 mb-3">
-              {kpis.map((k) => (
-                <InfoPill key={k.label} {...k} />
-              ))}
+          {/* Card */}
+          <div className="mx-auto w-full max-w-[1100px] bg-white rounded-[24px] p-4 md:p-5 shadow">
+            {/* Linha de controles: origem/destino + ações */}
+            <div className="flex flex-col md:flex-row md:items-end gap-3 mb-4">
+              <div className="flex-1">
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Origem</label>
+                <input
+                  value={originQuery}
+                  onChange={(e) => setOriginQuery(e.target.value)}
+                  placeholder="Digite um endereço ou clique em 'Definir no mapa'"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                />
+                <button
+                  onClick={() => setClickMode(clickMode === "origin" ? null : "origin")}
+                  className={`mt-2 text-xs rounded-full px-3 py-1 border ${
+                    clickMode === "origin"
+                      ? "bg-slate-800 text-white"
+                      : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {clickMode === "origin" ? "Clique no mapa: escolhendo origem..." : "Definir no mapa"}
+                </button>
+              </div>
+
+              <div className="flex-1">
+                <label className="block text-xs font-semibold text-slate-500 mb-1">Destino</label>
+                <input
+                  value={destQuery}
+                  onChange={(e) => setDestQuery(e.target.value)}
+                  placeholder="Digite um endereço ou clique em 'Definir no mapa'"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                />
+                <button
+                  onClick={() => setClickMode(clickMode === "destination" ? null : "destination")}
+                  className={`mt-2 text-xs rounded-full px-3 py-1 border ${
+                    clickMode === "destination"
+                      ? "bg-slate-800 text-white"
+                      : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {clickMode === "destination" ? "Clique no mapa: escolhendo destino..." : "Definir no mapa"}
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={traceBySearch}
+                  className="h-10 rounded-lg bg-[#92dbe1] text-[#02343F] px-4 font-medium hover:opacity-90"
+                >
+                  Traçar
+                </button>
+                <button
+                  onClick={resetRoute}
+                  className="h-10 rounded-lg border border-slate-300 text-slate-700 px-4 font-medium hover:bg-slate-50"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
 
-            <RouteMap waypoints={wps} />
+            {/* Pílulas com valores REAIS */}
+            <div className="flex gap-2 mb-3">
+              <InfoPill label="Estimativa" value={summary.durationSeconds ? `${(summary.durationSeconds/60).toFixed(0)} min` : "—"} />
+              <InfoPill label="Distância" value={summary.distanceMeters ? `${(summary.distanceMeters/1000).toFixed(1)} km` : "—"} />
+            </div>
 
-            <div className="mt-3 flex gap-2">
-              <button className="px-4 py-2 rounded-lg bg-[#92dbe1] text-[#02343F] font-medium hover:opacity-90">
+            {/* Mapa */}
+            <RouteMap
+              waypoints={wps}
+              onWaypointsChange={setWps}
+              onSummary={setSummary}
+              height={560}
+              startSim={simKey}   // muda o valor para disparar
+              stopSim={stopKey}   // idem
+              allowClickSet={clickMode} // 'origin' | 'destination' | null
+            />
+
+            {/* Ações de rota */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                onClick={startSimulation}
+                className="px-4 py-2 rounded-lg bg-[#92dbe1] text-[#02343F] font-medium hover:opacity-90 disabled:opacity-50"
+                disabled={!(wps && wps.length >= 2)}
+              >
                 Iniciar Rota
               </button>
-              <button className="px-4 py-2 rounded-lg border border-[#92dbe1] text-[#02343F] hover:bg-[#f6fbfc]">
-                Alternar Paradas
+              <button
+                onClick={stopSimulation}
+                className="px-4 py-2 rounded-lg border border-[#92dbe1] text-[#02343F] hover:bg-[#f6fbfc]"
+              >
+                Parar
               </button>
+              <span className="text-xs text-slate-500 mt-2">
+                Dica: você pode <b>arrastar os pinos</b> no mapa para ajustar a rota.
+              </span>
             </div>
           </div>
         </main>
