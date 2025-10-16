@@ -7,14 +7,7 @@ import LoginForm from './components/LoginForm';
 const SplashScreen = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Redireciona para a tela de login após 3 segundos
-    const timer = setTimeout(() => {
-      navigate('/login');
-    }, 3000); // 3000ms = 3 segundos
-
-    return () => clearTimeout(timer); // Limpa o timer se o componente for desmontado
-  }, [navigate]);
+  
 
   return (
     <div>
