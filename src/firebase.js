@@ -12,12 +12,12 @@ const VAPID_KEY =
 
 // 🔧 SUBSTITUA pelos SEUS valores do console Firebase
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "SEU_API_KEY",
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "SEU_AUTH_DOMAIN",
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "SEU_PROJECT_ID",
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "SEU_STORAGE_BUCKET",
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || "SEU_MESSAGING_SENDER_ID",
-  appId: process.env.REACT_APP_FIREBASE_APP_ID || "SEU_APP_ID",
+    apiKey: process.env.REACT_APP_API_KEY,
+    authDomain: "estoque-tcc.firebaseapp.com",
+    projectId: "estoque-tcc",
+    storageBucket: "estoque-tcc.firebasestorage.app",
+    messagingSenderId: "710664269621",
+    appId: "1:710664269621:web:075a7fd3a59223650be67c"
 };
 
 export const firebaseApp = initializeApp(firebaseConfig);
