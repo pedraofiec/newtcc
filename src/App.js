@@ -1,4 +1,5 @@
-import React from 'react';
+// src/App.js
+import React, { useEffect } from 'react';
 
 // Importa os componentes de cada funcionalidade
 import HomeScreen from './features/home/components/HomeScreen';
@@ -18,8 +19,19 @@ import DriverScreen from './features/motorista/components/DriverScreen';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import RotasPage from './features/rotas/pages/RotasPage';
 
+// 🔔 Toaster (toast com Tailwind) e FCM helpers
+import { Toaster } from 'react-hot-toast';
+import { requestFcmToken, listenForegroundMessages } from './firebase';
 
 function App() {
+  // Bootstrap das notificações (foreground + token via VAPID)
+  useEffect(() => {
+    (async () => {
+      await requestFcmToken();          // usa VITE_FIREBASE_VAPID_KEY, se definido
+      await listenForegroundMessages(); // exibe toast quando a aba estiver ativa
+    })();
+  }, []);
+
   return (
     <div className="App">
       <Routes>
@@ -36,6 +48,9 @@ function App() {
         <Route path="/motoristas/:id" element={<DriverProfile />} />
         <Route path="/rotas" element={<RotasPage />} />
       </Routes>
+
+      {/* Toaster global para notificações em foreground */}
+      <Toaster position="top-right" toastOptions={{ className: 'text-sm' }} />
     </div>
   );
 }
