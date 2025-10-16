@@ -47,7 +47,7 @@ const LoginForm = () => {
       // Use as credenciais de teste: teste@rotavan.com.br / 123
       const response = await LoginService.login({ email, password });
       
-      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('accessToken', response.accessToken);
       
       // Redireciona para a rota protegida após o login
       navigate(redirectTo, { replace: true });

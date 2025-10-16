@@ -23,9 +23,9 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<HomeScreen />} />
         <Route path="/splash" element={<SplashScreen />} />
         <Route path="/login" element={<SplashScreen />} />
+        <Route path="/" element={<HomeScreen />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<UserTypeSelection />} />
         <Route path="/register/responsible" element={<RegisterResponsible />} />
