@@ -7,7 +7,7 @@ importScripts("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-com
 
 // 🔧 SUBSTITUA pelos SEUS valores do console Firebase
 firebase.initializeApp({
-  apiKey: "SEU_API_KEY",
+  apiKey: "AIzaSyCjALKEFFvWBdFFfDAiscUV-uUwhaLgwiU",
   authDomain: "SEU_AUTH_DOMAIN",
   projectId: "SEU_PROJECT_ID",
   storageBucket: "SEU_STORAGE_BUCKET",
