@@ -21,21 +21,60 @@ const LoginForm = ({ goToRegister }) => {
   const { setMe } = useUserStore();
   const { setAuthData } = useAuthStore();
 
+  // --- MUDANÇA 1: Corrigido o redirecionamento ---
+  // Antes estava '|| /', o que faria ele voltar para o login.
+  // Agora ele vai para '/home' por padrão após logar.
   const redirectTo =
-    new URLSearchParams(location.search).get('redirect') || '/';
+    new URLSearchParams(location.search).get('redirect') || '/home'; 
 
   React.useEffect(() => {
+    // Esta lógica de verificar se já existe token continua útil
     const token = localStorage.getItem('accessToken');
     if (token) {
       navigate(redirectTo, { replace: true });
     }
   }, [navigate, redirectTo]);
 
+  
+  // --- MUDANÇA 2: Função de handleSubmit SIMULADA ---
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
+    console.warn('--- MODO DE TESTE (SEM BACKEND) ---');
+
+    // Simula um atraso de rede de 1.5 segundos
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    try {
+      // Vamos simular uma lógica simples:
+      // Se o email for "teste@teste.com" e a senha "123", o login funciona.
+      if (email === 'teste@teste.com' && password === '123') {
+        
+        console.log('Simulação de login: SUCESSO');
+        // 1. Simula a resposta do backend
+        const fakeResponse = { accessToken: 'token-falso-para-teste-12345' };
+
+        // 2. Salva o token falso no localStorage
+        localStorage.setItem('accessToken', fakeResponse.accessToken);
+
+        // 3. Navega para a página de destino (agora '/home')
+        navigate(redirectTo, { replace: true });
+
+      } else {
+        // 4. Simula um erro de credenciais
+        console.log('Simulação de login: FALHA');
+        throw new Error('Credenciais inválidas. Tente novamente.');
+      }
+
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+
+    /* --- CÓDIGO DO BACKEND ORIGINAL (Comentado) ---
     try {
       const response = await LoginService.login({ email, password });
       localStorage.setItem('accessToken', response.accessToken);
@@ -46,6 +85,7 @@ const LoginForm = ({ goToRegister }) => {
     } finally {
       setIsSubmitting(false);
     }
+    */
   };
 
   return (
