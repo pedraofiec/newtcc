@@ -3,18 +3,21 @@ import React from 'react';
 import { FaUser, FaPlus } from 'react-icons/fa';
 import './Register.css';
 
-const RegisterResponsible = () => {
+// ⚠️ Recebe goToLogin como prop
+const RegisterResponsible = ({ goToLogin }) => {
   const [fullName, setFullName] = React.useState('');
   const [cpf, setCpf] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [address, setAddress] = React.useState('');
-  const [email, setEmail] = React.useState(''); // <-- Novo campo de estado
-  const [password, setPassword] = React.useState(''); // <-- Novo campo de estado
+  const [email, setEmail] = React.useState(''); 
+  const [password, setPassword] = React.useState(''); 
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Cadastro de responsável solicitado:', { fullName, cpf, phone, address, email, password }); // <-- Atualizado
+    console.log('Cadastro de responsável solicitado:', { fullName, cpf, phone, address, email, password });
     alert('Cadastro de responsável solicitado.');
+    // ⚠️ Redireciona para o AuthPage (modo 'login')
+    if (goToLogin) goToLogin();
   };
 
   return (
@@ -74,6 +77,16 @@ const RegisterResponsible = () => {
           >
             Criar conta
           </button>
+           {/* Botão para voltar ao Login */}
+          {goToLogin && (
+              <button 
+                  type="button" 
+                  onClick={goToLogin}
+                  className="w-full py-3 mt-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-200"
+              >
+                  VOLTAR PARA LOGIN
+              </button>
+          )}
         </form>
       </div>
     </div>

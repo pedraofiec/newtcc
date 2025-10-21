@@ -1,29 +1,29 @@
-// src/App.js
 import React, { useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
-
-// Importa o NOVO PrivateRoute
-import PrivateRoute from './features/shared/components/PrivateRoute'; 
 
 // Importa os componentes de cada funcionalidade
 import HomeScreen from './features/home/components/HomeScreen';
-import SplashScreen from './features/splash/SplashScreen'; // Corrigido o caminho
+import SplashScreen from './features/splash/SplashScreen';
 import LoginForm from './features/splash/components/LoginForm';
+import UserTypeSelection from './features/splash/components/UserTypeSelection';
 import ForgotPassword from './features/splash/components/ForgotPassword';
 
-// ... (Outras importações permanecem iguais)
-import UserTypeSelection from './features/splash/components/UserTypeSelection';
+// Importa os componentes de cadastro
 import RegisterResponsible from './features/cadastro/components/RegisterResponsible';
 import RegisterDriver from './features/cadastro/components/RegisterDriver';
-// ... (demais imports de cadastro e motorista)
+import RegisterSchool from './features/cadastro/components/RegisterSchool';
+import RegisterStudent from './features/cadastro/components/RegisterStudent';
+import DriverProfile from './features/motorista/components/DriverProfile';
+import DriverScreen from './features/motorista/components/DriverScreen';
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RotasPage from './features/rotas/pages/RotasPage';
 
 // 🔔 Toaster (toast com Tailwind) e FCM helpers
 import { Toaster } from 'react-hot-toast';
 import { requestFcmToken, listenForegroundMessages } from './firebase';
 
-
 function App() {
-  // ... (useEffect para notificações permanece igual)
+  // Bootstrap das notificações (foreground + token via VAPID)
   useEffect(() => {
     (async () => {
       await requestFcmToken();          // usa VITE_FIREBASE_VAPID_KEY, se definido
@@ -34,41 +34,18 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        {/* 1. Rota RAIZ: O usuário sempre começa no SplashScreen */}
-        <Route path="/" element={<SplashScreen />} /> 
-        
-        {/* 2. Rotas de Autenticação (Acesso público) */}
-        {/* Mantive o /login apontando para LoginForm, não mais para SplashScreen */}
-        <Route path="/login" element={<LoginForm />} />
+        <Route path="/splash" element={<SplashScreen />} />
+        <Route path="/login" element={<SplashScreen />} />
+        <Route path="/" element={<HomeScreen />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<UserTypeSelection />} />
-
-        {/* Rotas de Cadastro (Acesso público) */}
         <Route path="/register/responsible" element={<RegisterResponsible />} />
         <Route path="/register/driver" element={<RegisterDriver />} />
-        {/* ... (Demais rotas de cadastro) */}
-
-        {/* 3. Rota PROTEGIDA: HomeScreen SÓ é acessível após login */}
-        {/* Substituí a rota direta por uma rota PrivateRoute */}
-        <Route 
-          path="/home" 
-          element={
-            <PrivateRoute>
-              <HomeScreen />
-            </PrivateRoute>
-          } 
-        />
-        
-        {/* Rota Protegida de Dashboard (Se existir) */}
-        {/* <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} /> */}
-        
-        {/* Rotas Protegidas de Motorista e Rotas */}
-        {/* Você deve envolver todas as rotas internas com PrivateRoute! */}
-        {/* Exemplo: */}
-        {/* <Route path="/motoristas" element={<PrivateRoute><DriverScreen /></PrivateRoute>} /> */}
-        
-        {/* ... (Demais rotas, mantendo como estavam ou protegendo com PrivateRoute) */}
-        
+        <Route path="/register/school" element={<RegisterSchool />} />
+        <Route path="/register/student" element={<RegisterStudent />} />
+        <Route path="/motoristas" element={<DriverScreen />} />
+        <Route path="/motoristas/:id" element={<DriverProfile />} />
+        <Route path="/rotas" element={<RotasPage />} />
       </Routes>
 
       {/* Toaster global para notificações em foreground */}

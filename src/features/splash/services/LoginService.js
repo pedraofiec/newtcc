@@ -2,11 +2,6 @@
 import api from '../../shared/utils/api';
 
 // Credenciais Falsas para Teste
-const TEST_USER = {
-  email: 'teste@rotavan.com.br',
-  password: '123'
-};
-const FAKE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-token-valido';
 
 const LoginService = {
   async login({ email, password }) {

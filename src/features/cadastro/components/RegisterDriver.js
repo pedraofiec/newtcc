@@ -3,7 +3,8 @@ import React from 'react';
 import { FaUser, FaBus, FaPlus } from 'react-icons/fa';
 import './Register.css';
 
-const RegisterDriver = () => {
+// ⚠️ Recebe goToLogin como prop
+const RegisterDriver = ({ goToLogin }) => {
   const [fullName, setFullName] = React.useState('');
   const [license, setLicense] = React.useState('');
   const [phone, setPhone] = React.useState('');
@@ -12,8 +13,10 @@ const RegisterDriver = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Cadastro de motorista solicitado:', { fullName, license, phone });
+    console.log('Cadastro de motorista solicitado:', { fullName, license, phone, email, password }); // Adicionei email/password
     alert('Cadastro de motorista solicitado.');
+    // ⚠️ Redireciona para o AuthPage (modo 'login')
+    if (goToLogin) goToLogin();
   };
 
   return (
@@ -66,6 +69,16 @@ const RegisterDriver = () => {
           >
             Criar conta
           </button>
+          {/* Botão para voltar ao Login */}
+          {goToLogin && (
+              <button 
+                  type="button" 
+                  onClick={goToLogin}
+                  className="w-full py-3 mt-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-200"
+              >
+                  VOLTAR PARA LOGIN
+              </button>
+          )}
         </form>
       </div>
     </div>
