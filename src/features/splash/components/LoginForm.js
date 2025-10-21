@@ -4,7 +4,8 @@ import { FaUser } from 'react-icons/fa6';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './LoginForm.css';
 import LoginService from '../services/LoginService';
-import Fundo from './assets/Fundo1.png';
+// Removido 'Fundo' pois não estava sendo usado no JSX
+// import Fundo from './assets/Fundo1.png'; 
 import useUserStore from '../../shared/store/user-store';
 import useAuthStore from '../../shared/store/auth-store';
 import { jwtDecode } from 'jwt-decode';
@@ -21,71 +22,63 @@ const LoginForm = ({ goToRegister }) => {
   const { setMe } = useUserStore();
   const { setAuthData } = useAuthStore();
 
-  // --- MUDANÇA 1: Corrigido o redirecionamento ---
-  // Antes estava '|| /', o que faria ele voltar para o login.
-  // Agora ele vai para '/home' por padrão após logar.
   const redirectTo =
-    new URLSearchParams(location.search).get('redirect') || '/home'; 
+    new URLSearchParams(location.search).get('redirect') || '/home';
 
+  // Efeito que verifica se o usuário JÁ ESTÁ LOGADO
+  // e redireciona para a /home se um token for encontrado.
   React.useEffect(() => {
-    // Esta lógica de verificar se já existe token continua útil
     const token = localStorage.getItem('accessToken');
     if (token) {
-      navigate(redirectTo, { replace: true });
+      // Se já tem token, decodifica e atualiza o estado global
+      // Isso garante que o estado persista ao recarregar a página
+      try {
+        const userData = jwtDecode(token);
+        setMe(userData);
+        setAuthData({ accessToken: token }); // Atualiza o auth store
+        navigate(redirectTo, { replace: true });
+      } catch (e) {
+        // Token inválido, limpa
+        localStorage.removeItem('accessToken');
+      }
     }
-  }, [navigate, redirectTo]);
+  }, [navigate, redirectTo, setMe, setAuthData]);
 
   
-  // --- MUDANÇA 2: Função de handleSubmit SIMULADA ---
+  // --- ATUALIZAÇÃO: handleSubmit restaurado para usar o backend real ---
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
-    console.warn('--- MODO DE TESTE (SEM BACKEND) ---');
-
-    // Simula um atraso de rede de 1.5 segundos
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
     try {
-      // Vamos simular uma lógica simples:
-      // Se o email for "teste@teste.com" e a senha "123", o login funciona.
-      if (email === 'teste@teste.com' && password === '123') {
-        
-        console.log('Simulação de login: SUCESSO');
-        // 1. Simula a resposta do backend
-        const fakeResponse = { accessToken: 'token-falso-para-teste-12345' };
-
-        // 2. Salva o token falso no localStorage
-        localStorage.setItem('accessToken', fakeResponse.accessToken);
-
-        // 3. Navega para a página de destino (agora '/home')
-        navigate(redirectTo, { replace: true });
-
-      } else {
-        // 4. Simula um erro de credenciais
-        console.log('Simulação de login: FALHA');
-        throw new Error('Credenciais inválidas. Tente novamente.');
-      }
-
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-
-    /* --- CÓDIGO DO BACKEND ORIGINAL (Comentado) ---
-    try {
+      // 1. Chama o serviço de login real
       const response = await LoginService.login({ email, password });
+
+      // 2. Salva o token
       localStorage.setItem('accessToken', response.accessToken);
+
+      // 3. Decodifica o token para obter os dados do usuário
+      const userData = jwtDecode(response.accessToken);
+
+      // 4. Atualiza os stores globais do Zustand
+      setAuthData(response); // Salva os dados de autenticação (ex: tokens)
+      setMe(userData);       // Salva os dados do perfil do usuário
+
+      // 5. Navega para a página de destino (ex: /home)
       navigate(redirectTo, { replace: true });
+
     } catch (e) {
       console.error(e);
-      setError('Não foi possível entrar. Verifique suas credenciais.');
+      // Define uma mensagem de erro mais amigável
+      if (e.response && e.response.status === 401) {
+        setError('Email ou senha inválidos.');
+      } else {
+        setError('Não foi possível entrar. Tente novamente mais tarde.');
+      }
     } finally {
       setIsSubmitting(false);
     }
-    */
   };
 
   return (

@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 
 // Importa os componentes de cada funcionalidade
-import HomeScreen from './features/home/components/HomeScreen';
 import SplashScreen from './features/splash/SplashScreen';
 import LoginForm from './features/splash/components/LoginForm';
+import HomeScreen from './features/home/components/HomeScreen';
 import UserTypeSelection from './features/splash/components/UserTypeSelection';
 import ForgotPassword from './features/splash/components/ForgotPassword';
 
