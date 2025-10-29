@@ -1,8 +1,6 @@
 // src/features/splash/services/LoginService.js
 import api from '../../shared/utils/api';
 
-// Credenciais Falsas para Teste
-
 const LoginService = {
   async login({ email, password }) {
     // Lógica REAL da API (Comente ou remova após os testes)
