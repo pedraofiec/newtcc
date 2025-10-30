@@ -33,7 +33,7 @@ const ForgotPassword = () => {
       }}
     >
       {/* Overlay para o efeito de desfoque/vidro fosco no fundo */}
-      <div className="absolute inset-0 bg-white opacity-30"></div>
+      <div className="absolute inset-0 bg-white opacity-0"></div>
 
       {/* Card de Recuperação: Aplica Glassmorphism e animação */}
       <div 
