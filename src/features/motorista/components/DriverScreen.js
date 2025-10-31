@@ -1,5 +1,5 @@
 // src/features/motorista/components/DriverScreen.js
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import {
   FaUserCircle,
@@ -97,8 +97,45 @@ const SideBar = () => {
   );
 };
 
-/* ============== DriverScreen (conteúdo da página) ============== */
+/* ============== Modal Reutilizável ============== */
+const Modal = ({ title, children, onClose }) => (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+    <div className="bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6">
+      <h2 className="text-lg font-bold mb-4 text-slate-800">{title}</h2>
+      {children}
+      <div className="mt-4 text-right">
+        <button
+          onClick={onClose}
+          className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+/* ============== DriverScreen ============== */
 export default function DriverScreen() {
+  const [showDisponibilidade, setShowDisponibilidade] = useState(false);
+  const [showVeiculo, setShowVeiculo] = useState(false);
+
+  // Handlers
+  const handlePublicarDisponibilidade = () => setShowDisponibilidade(true);
+  const handleCadastrarVeiculo = () => setShowVeiculo(true);
+
+  const handleSubmitDisponibilidade = (e) => {
+    e.preventDefault();
+    alert("Disponibilidade publicada com sucesso!");
+    setShowDisponibilidade(false);
+  };
+
+  const handleSubmitVeiculo = (e) => {
+    e.preventDefault();
+    alert("Veículo cadastrado com sucesso!");
+    setShowVeiculo(false);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
       <Header />
@@ -113,8 +150,9 @@ export default function DriverScreen() {
             </div>
           </div>
 
-          {/* Cards simples – substitua pelo seu conteúdo real */}
+          {/* Cards */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Card 1 */}
             <div className="rounded-2xl bg-white p-5 shadow ring-1 ring-slate-100">
               <h3 className="font-semibold text-slate-800 mb-2">Status da Rota</h3>
               <p className="text-sm text-slate-600 mb-4">
@@ -127,27 +165,115 @@ export default function DriverScreen() {
                 >
                   Ver Rotas
                 </NavLink>
-                <button className="px-4 py-2 rounded-lg border border-[#92dbe1] text-[#02343F] hover:bg-[#f6fbfc]">
+                <button
+                  onClick={handlePublicarDisponibilidade}
+                  className="px-4 py-2 rounded-lg border border-[#92dbe1] text-[#02343F] hover:bg-[#f6fbfc]"
+                >
                   Publicar Disponibilidade
                 </button>
               </div>
             </div>
 
+            {/* Card 2 */}
             <div className="rounded-2xl bg-white p-5 shadow ring-1 ring-slate-100">
               <h3 className="font-semibold text-slate-800 mb-2">Solicitações Pendentes</h3>
               <p className="text-sm text-slate-600">0 solicitações aguardando análise.</p>
             </div>
 
+            {/* Card 3 */}
             <div className="rounded-2xl bg-white p-5 shadow ring-1 ring-slate-100">
               <h3 className="font-semibold text-slate-800 mb-2">Veículo</h3>
               <p className="text-sm text-slate-600">Nenhum veículo cadastrado.</p>
-              <button className="mt-3 px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-700">
+              <button
+                onClick={handleCadastrarVeiculo}
+                className="mt-3 px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-700"
+              >
                 Cadastrar Veículo
               </button>
             </div>
           </div>
         </main>
       </div>
+
+      {/* ============== MODAL: Publicar Disponibilidade ============== */}
+      {showDisponibilidade && (
+        <Modal title="Publicar Disponibilidade" onClose={() => setShowDisponibilidade(false)}>
+          <form onSubmit={handleSubmitDisponibilidade} className="flex flex-col gap-3">
+            <label className="text-sm text-slate-700">
+              Data:
+              <input
+                type="date"
+                required
+                className="w-full border border-slate-300 rounded-lg p-2 mt-1"
+              />
+            </label>
+            <label className="text-sm text-slate-700">
+              Horário disponível:
+              <input
+                type="time"
+                required
+                className="w-full border border-slate-300 rounded-lg p-2 mt-1"
+              />
+            </label>
+            <label className="text-sm text-slate-700">
+              Local:
+              <input
+                type="text"
+                placeholder="Ex: Centro - Bairro X"
+                required
+                className="w-full border border-slate-300 rounded-lg p-2 mt-1"
+              />
+            </label>
+            <button
+              type="submit"
+              className="mt-2 px-4 py-2 bg-[#8AD7E1] text-[#02343F] font-semibold rounded-lg hover:opacity-90"
+            >
+              Publicar
+            </button>
+          </form>
+        </Modal>
+      )}
+
+      {/* ============== MODAL: Cadastrar Veículo ============== */}
+      {showVeiculo && (
+        <Modal title="Cadastrar Veículo" onClose={() => setShowVeiculo(false)}>
+          <form onSubmit={handleSubmitVeiculo} className="flex flex-col gap-3">
+            <label className="text-sm text-slate-700">
+              Modelo:
+              <input
+                type="text"
+                placeholder="Ex: Renault Master"
+                required
+                className="w-full border border-slate-300 rounded-lg p-2 mt-1"
+              />
+            </label>
+            <label className="text-sm text-slate-700">
+              Placa:
+              <input
+                type="text"
+                placeholder="ABC-1234"
+                required
+                className="w-full border border-slate-300 rounded-lg p-2 mt-1 uppercase"
+              />
+            </label>
+            <label className="text-sm text-slate-700">
+              Capacidade de passageiros:
+              <input
+                type="number"
+                placeholder="Ex: 15"
+                required
+                className="w-full border border-slate-300 rounded-lg p-2 mt-1"
+              />
+            </label>
+            <button
+              type="submit"
+              className="mt-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700"
+            >
+              Salvar
+            </button>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }

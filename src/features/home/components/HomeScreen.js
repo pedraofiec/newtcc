@@ -100,7 +100,7 @@ const Header = () => {
 const SideBar = () => {
   const navigate = useNavigate();
   const navItems = [
-    { name: "Dashboard", path: "/dashboard", icon: MdOutlineDashboard },
+    { name: "Dashboard", icon: MdOutlineDashboard },
     { name: "Rotas", path: "/rotas", icon: FaMapMarkedAlt },
     { name: "Motoristas", path: "/motoristas", icon: FaCar },
     { name: "Responsáveis", path: "/responsaveis", icon: FaUserCircle }
@@ -237,7 +237,7 @@ const DependentFormModal = ({ isOpen, onClose, onSave }) => {
             id: Date.now(), 
             nome: formData.nome,
             idade: Math.floor(Math.random() * 10) + 5, 
-            ano: "Simulado", 
+            ano: formData.anoEscolar, 
             escola: formData.escola,
             ...formData 
         };
