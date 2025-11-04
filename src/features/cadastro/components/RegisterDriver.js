@@ -3,6 +3,9 @@ import React from 'react';
 import { FaUser, FaBus, FaPlus } from 'react-icons/fa';
 import './Register.css';
 
+// 🚀 IMPORTANDO O NOVO SERVIÇO
+import RegisterService from '../service/RegisterService';
+
 // ⚠️ Recebe goToLogin como prop
 const RegisterDriver = ({ goToLogin }) => {
   const [fullName, setFullName] = React.useState('');
@@ -10,13 +13,38 @@ const RegisterDriver = ({ goToLogin }) => {
   const [phone, setPhone] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [email, setEmail] = React.useState('');
+  
+  // 💡 NOVOS ESTADOS PARA API
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => { // 💡 TORNANDO ASSÍNCRONA
     event.preventDefault();
-    console.log('Cadastro de motorista solicitado:', { fullName, license, phone, email, password }); // Adicionei email/password
-    alert('Cadastro de motorista solicitado.');
-    // ⚠️ Redireciona para o AuthPage (modo 'login')
-    if (goToLogin) goToLogin();
+    setError('');
+    setLoading(true);
+
+    const data = { 
+      fullName, 
+      license, 
+      phone, 
+      email, 
+      password 
+    };
+
+    try {
+      // 🚀 CHAMA O SERVIÇO DE CADASTRO
+      await RegisterService.registerDriver(data);
+      
+      // Sucesso: feedback e redirecionamento
+      alert('Cadastro de Motorista realizado com sucesso! Faça login para continuar.');
+      if (goToLogin) goToLogin();
+
+    } catch (err) {
+      // Falha: exibe o erro
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,16 +52,26 @@ const RegisterDriver = ({ goToLogin }) => {
       <div className="flex flex-col items-center justify-center p-8 bg-white rounded-2xl shadow-2xl mt-16 form-container is-visible">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">CADASTRO DE MOTORISTA</h2>
         <div className="relative mb-6">
-          <FaUser className="text-8xl text-gray-800" />
-          <FaPlus className="absolute bottom-0 right-0 text-3xl text-gray-600 bg-white border-2 border-white rounded-full" />
+          <FaBus className="text-8xl text-gray-800 opacity-70" />
+          <FaPlus className="absolute bottom-0 right-0 text-3xl text-[#4DD0E1] bg-white rounded-full p-1" />
         </div>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        
+        {/* 💡 FEEDBACK DE ERRO */}
+        {error && (
+            <div className="w-full p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-md border border-red-200">
+                {error}
+            </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
+          {/* ... (Campos de input) ... */}
           <input
             type="text"
-            placeholder="Nome completo"
+            placeholder="Nome Completo"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
           />
           <input
             type="text"
@@ -41,6 +79,7 @@ const RegisterDriver = ({ goToLogin }) => {
             value={license}
             onChange={(e) => setLicense(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
           />
           <input
             type="tel"
@@ -48,6 +87,7 @@ const RegisterDriver = ({ goToLogin }) => {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
           />
           <input
             type="email"
@@ -55,6 +95,7 @@ const RegisterDriver = ({ goToLogin }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
           />
           <input
             type="password"
@@ -62,21 +103,24 @@ const RegisterDriver = ({ goToLogin }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
           />
+
           <button
             type="submit"
-            className="w-full py-3 mt-4 text-lg font-semibold text-white bg-[#4DD0E1] rounded-full shadow-md hover:bg-[#34A4B5] focus:outline-none focus:ring-2 focus:ring-[#4DD0E1] focus:ring-offset-2 transition duration-300"
+            disabled={loading} // 💡 DESABILITA SE CARREGANDO
+            className={`w-full py-3 mt-4 text-lg font-semibold text-white bg-[#4DD0E1] rounded-full shadow-md transition duration-300 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#34A4B5] focus:outline-none focus:ring-2 focus:ring-[#4DD0E1] focus:ring-offset-2'}`}
           >
-            Criar conta
+            {loading ? 'Cadastrando...' : 'Criar conta'}
           </button>
           {/* Botão para voltar ao Login */}
           {goToLogin && (
               <button 
                   type="button" 
                   onClick={goToLogin}
-                  className="w-full py-3 mt-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-200"
+                  className="w-full py-3 mt-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition duration-300"
               >
-                  VOLTAR PARA LOGIN
+                  Já tem conta? Fazer Login
               </button>
           )}
         </form>

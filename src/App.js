@@ -14,6 +14,7 @@ import RegisterSchool from './features/cadastro/components/RegisterSchool.js';
 import RegisterStudent from './features/cadastro/components/RegisterStudent.js';
 import DriverProfile from './features/motorista/components/DriverProfile.js';
 import DriverScreen from './features/motorista/components/DriverScreen.js';
+import SettingsScreen from './features/home/components/SettingsScreen.js';
 
 // 1. BrowserRouter PRECISA ser importado
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -66,6 +67,11 @@ function App() {
           <Route path="/motoristas" element={<DriverScreen />} />
           <Route path="/motoristas/:id" element={<DriverProfile />} />
           <Route path="/rotas" element={<RotasPage />} />
+
+          <Route path="/settings" element={<SettingsScreen />} />
+          <Route path="/settings/perfil" element={<SettingsScreen />}  />
+          <Route path="/settings/alterar-senha" element={<SettingsScreen />}  />
+          <Route path="/termos-de-uso" element={<SettingsScreen />}  />
         </Routes>
       
 

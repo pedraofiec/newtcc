@@ -1,11 +1,9 @@
 // src/features/home/components/HomeScreen.jsx (CORREÇÃO DE ERRO: Substituindo react-icons por SVGs inline)
 import React, { useEffect, useState, memo } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import axios from "axios";
 
 import {
   FaUserCircle,
-  FaSignOutAlt,
   FaCog,
   FaMapMarkedAlt,
   FaCar
@@ -22,14 +20,6 @@ const IconPlus = (props) => (
 );
 
 // Equivalente a FaUsers
-const IconUsers = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline><path d="M19 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-);
-
-// Equivalente a FaCar
-const IconCar = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 17H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4"></path><line x1="16" y1="5" x2="16" y2="8"></line><line x1="8" y1="5" x2="8" y2="8"></line><circle cx="5.5" cy="17.5" r="2.5"></circle><circle cx="18.5" cy="17.5" r="2.5"></circle></svg>
-);
 
 // Equivalente a FaUserCircle
 const IconUserCircle = (props) => (
@@ -37,9 +27,7 @@ const IconUserCircle = (props) => (
 );
 
 // Equivalente a FaMapMarkedAlt (usando FaMap)
-const IconMap = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
-);
+
 
 // Equivalente a FaSignOutAlt (usando LogOut)
 const IconSignOut = (props) => (
@@ -49,9 +37,6 @@ const IconSignOut = (props) => (
 // Equivalente a FaCog (usando Settings)
 
 // Equivalente a MdOutlineDashboard (usando LayoutGrid)
-const IconDashboard = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-);
 
 // --------------------------------------------------------------------------------------
 // FIM DOS ÍCONES SVG INLINE
