@@ -16,6 +16,10 @@ import DriverProfile from './features/motorista/components/DriverProfile.js';
 import DriverScreen from './features/motorista/components/DriverScreen.js';
 import SettingsScreen from './features/home/components/SettingsScreen.js';
 
+import ChangePasswordScreen from './features/home/components/settings/ChangePasswordScreen.js';
+import TermsOfUseScreen from './features/home/components/settings/TermsOfUseScreen.js';
+import EditProfileScreen from './features/home/components/settings/EditProfileScreen.js';
+
 // 1. BrowserRouter PRECISA ser importado
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import RotasPage from './features/rotas/pages/RotasPage.js';
@@ -69,9 +73,9 @@ function App() {
           <Route path="/rotas" element={<RotasPage />} />
 
           <Route path="/settings" element={<SettingsScreen />} />
-          <Route path="/settings/perfil" element={<SettingsScreen />}  />
-          <Route path="/settings/alterar-senha" element={<SettingsScreen />}  />
-          <Route path="/termos-de-uso" element={<SettingsScreen />}  />
+          <Route path="/settings/perfil" element={<EditProfileScreen />}  />
+          <Route path="/settings/alterar-senha" element={<ChangePasswordScreen />}  />
+          <Route path="/termos-de-uso" element={<TermsOfUseScreen />}  />
         </Routes>
       
 
