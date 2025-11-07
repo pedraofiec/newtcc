@@ -16,7 +16,7 @@ import RegisterStudent from './features/cadastro/components/RegisterStudent';
 import DriverProfile from './features/motorista/components/DriverProfile';
 import DriverScreen from './features/motorista/components/DriverScreen';
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import RotasPage from './features/rotas/pages/RotasPage';
 
 // 🔔 Toaster (toast com Tailwind) e FCM helpers
@@ -34,6 +34,7 @@ function App() {
 
   return (
     <div className="App">
+      <Router>
       <Routes>
         <Route path="/" element={<HomeScreen />} />
         <Route path="/splash" element={<SplashScreen />} />
@@ -48,6 +49,7 @@ function App() {
         <Route path="/motoristas/:id" element={<DriverProfile />} />
         <Route path="/rotas" element={<RotasPage />} />
       </Routes>
+      </Router>
 
       {/* Toaster global para notificações em foreground */}
       <Toaster position="top-right" toastOptions={{ className: 'text-sm' }} />

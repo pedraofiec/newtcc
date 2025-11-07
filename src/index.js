@@ -11,17 +11,13 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <HashRouter>
-    <App />
-  </HashRouter>
-);
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+let startApp = () => {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render( <App />);
+}
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/firebase-messaging-sw.js");
+if (!window.cordova) {
+    startApp();
+} else {
+    document.addEventListener('deviceready', startApp, false);
 }
