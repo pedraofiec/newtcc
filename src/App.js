@@ -15,9 +15,16 @@ import RegisterSchool from './features/cadastro/components/RegisterSchool';
 import RegisterStudent from './features/cadastro/components/RegisterStudent';
 import DriverProfile from './features/motorista/components/DriverProfile';
 import DriverScreen from './features/motorista/components/DriverScreen';
+import SettingsScreen from './features/home/components/SettingsScreen.js';
+
+import ChangePasswordScreen from './features/home/components/settings/ChangePasswordScreen.js';
+import TermsOfUseScreen from './features/home/components/settings/TermsOfUseScreen.js';
+import EditProfileScreen from './features/home/components/settings/EditProfileScreen.js';
 
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import RotasPage from './features/rotas/pages/RotasPage';
+
+import StatusModal from './features/shared/components/StatusModal.js';
 
 // 🔔 Toaster (toast com Tailwind) e FCM helpers
 import { Toaster } from 'react-hot-toast';
@@ -48,8 +55,15 @@ function App() {
         <Route path="/motoristas" element={<DriverScreen />} />
         <Route path="/motoristas/:id" element={<DriverProfile />} />
         <Route path="/rotas" element={<RotasPage />} />
+
+        <Route path="/settings" element={<SettingsScreen />} />
+        <Route path="/settings/perfil" element={<EditProfileScreen />}  />
+        <Route path="/settings/alterar-senha" element={<ChangePasswordScreen />}  />
+        <Route path="/termos-de-uso" element={<TermsOfUseScreen />}  />
       </Routes>
       </Router>
+
+      <StatusModal />
 
       {/* Toaster global para notificações em foreground */}
       <Toaster position="top-right" toastOptions={{ className: 'text-sm' }} />

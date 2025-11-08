@@ -1,98 +1,91 @@
-// src/features/splash/components/LoginForm.jsx
+// src/features/splash/components/LoginForm.js
 import React from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './LoginForm.css';
 import LoginService from '../services/LoginService';
-import Fundo from './assets/Fundo1.png';
+// Removido 'Fundo' pois não estava sendo usado no JSX
+// import Fundo from './assets/Fundo1.png'; 
 import useUserStore from '../../shared/store/user-store';
 import useAuthStore from '../../shared/store/auth-store';
 import { jwtDecode } from 'jwt-decode';
 
-// O componente CreateOrLoginOption FOI REMOVIDO COMPLETAMENTE.
-// A lógica de showSplash FOI REMOVIDA.
-
-const LoginForm = () => {
+const LoginForm = ({ goToRegister }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [showPass, setShowPass] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState(null);
-  
-  // O estado showSplash FOI REMOVIDO.
 
   const navigate = useNavigate();
   const location = useLocation();
-  const {setMe} = useUserStore();
-  const {setAuthData} = useAuthStore();
+  const { setMe } = useUserStore();
+  const { setAuthData } = useAuthStore();
 
   const redirectTo =
-    new URLSearchParams(location.search).get('redirect') || '/';
+    new URLSearchParams(location.search).get('redirect') || '/home';
 
-  // Verifica se o usuário já está logado e redireciona (Lógica Mantida)
+  // Efeito que verifica se o usuário JÁ ESTÁ LOGADO
+  // e redireciona para a /home se um token for encontrado.
   React.useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
+      // Se já tem token, decodifica e atualiza o estado global
+      // Isso garante que o estado persista ao recarregar a página
+      try {
+        const userData = jwtDecode(token);
+        setMe(userData);
+        setAuthData({ accessToken: token }); // Atualiza o auth store
         navigate(redirectTo, { replace: true });
+      } catch (e) {
+        // Token inválido, limpa
+        localStorage.removeItem('accessToken');
+      }
     }
-    // O useEffect para 'skipSplash' FOI REMOVIDO.
-  }, [navigate, redirectTo]);
+  }, [navigate, redirectTo, setMe, setAuthData]);
 
+  
+  // --- ATUALIZAÇÃO: handleSubmit restaurado para usar o backend real ---
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
     try {
-      // Use as credenciais de teste: teste@rotavan.com.br / 123
+      // 1. Chama o serviço de login real
       const response = await LoginService.login({ email, password });
-      
-      localStorage.setItem('accessToken', response.data.accessToken);
-      
-      // Redireciona para a rota protegida após o login
+
+      // 2. Salva o token
+      localStorage.setItem('accessToken', response.accessToken);
+
+      // 3. Decodifica o token para obter os dados do usuário
+      const userData = jwtDecode(response.accessToken);
+
+      // 4. Atualiza os stores globais do Zustand
+      setAuthData(response); // Salva os dados de autenticação (ex: tokens)
+      setMe(userData);       // Salva os dados do perfil do usuário
+
+      // 5. Navega para a página de destino (ex: /home)
       navigate(redirectTo, { replace: true });
+
     } catch (e) {
       console.error(e);
-      setError('Não foi possível entrar. Verifique suas credenciais.');
+      // Define uma mensagem de erro mais amigável
+      if (e.response && e.response.status === 401) {
+        setError('Email ou senha inválidos.');
+      } else {
+        setError('Não foi possível entrar. Tente novamente mais tarde.');
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const [form,setForm] = React.useState({email: "", password: ''})
-
-    const submitForm = async (e) => {
-        e.preventDefault();
-        
-        // Isso eu pego do backend
-        const responseData = await LoginService.login(form)
-        const receivedTokenFromBackend = responseData.token;
-        localStorage.setItem("accessToken", receivedTokenFromBackend)
-
-        const decodedUser = jwtDecode(receivedTokenFromBackend);
-        // Armazena o token e as informações decodificadas no Zustand
-        setAuthData(receivedTokenFromBackend, decodedUser);
-        console.log('Dados do usuário decodificados e armazenados:', decodedUser);
-        
-        const me = await LoginService.me();
-        setMe(me.tipo, me)
-    
-
-        navigate("/home")
-
-    }
-
-  // RENDERIZAÇÃO: Agora renderiza apenas o formulário de login imediatamente.
   return (
     <div
       className="relative min-h-[100dvh] flex slideIn flex-col items-center justify-center p-4 z-100"
-      style={{
-       
-        backgroundPosition: 'center',
-      }}
+      style={{ backgroundPosition: 'center' }}
     >
-
-      {/* Formulário de Login (Card central com Glassmorphism) */}
       <div className="relative w-full max-w-sm p-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-2xl ring-1 ring-white/50">
         <div className="flex justify-center mb-6">
           <FaUser className="text-8xl text-gray-800" />
@@ -105,7 +98,6 @@ const LoginForm = () => {
         )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          {/* Input Email */}
           <input
             type="email"
             placeholder="Email"
@@ -116,7 +108,6 @@ const LoginForm = () => {
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-white/80"
           />
 
-          {/* Input Senha */}
           <div className="relative">
             <input
               type={showPass ? 'text' : 'password'}
@@ -124,20 +115,17 @@ const LoginForm = () => {
               value={password}
               autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)}
-              // Corrigindo a largura para acomodar o botão 'Mostrar'
               className="w-full p-3 pr-16 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-white/80"
             />
             <button
               type="button"
               onClick={() => setShowPass((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 hover:text-gray-800"
-              aria-label={showPass ? 'Ocultar senha' : 'Mostrar senha'}
             >
               {showPass ? 'Ocultar' : 'Mostrar'}
             </button>
           </div>
 
-          {/* Botão Entrar */}
           <button
             type="submit"
             disabled={isSubmitting || !email || !password}
@@ -147,11 +135,10 @@ const LoginForm = () => {
           </button>
         </form>
 
-        {/* Links de navegação */}
         <div className="text-center mt-6 text-gray-700">
           <button
             type="button"
-            onClick={() => navigate('/register')}
+            onClick={goToRegister}
             className="block w-full text-sm font-medium hover:underline mb-1"
           >
             Criar conta

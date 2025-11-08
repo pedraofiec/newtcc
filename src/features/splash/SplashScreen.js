@@ -1,31 +1,27 @@
-// src/features/splash/components/SplashScreen.js
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Fundo from './components/assets/Fundo1.png';
+import React from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Importe o hook
 import LoginForm from './components/LoginForm';
+import Fundo from './components/assets/Fundo1.png'; // Assumindo que o fundo é usado aqui // Assumindo que você tem estilos aqui
 
 const SplashScreen = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 2. Inicialize o hook
 
-  useEffect(() => {
-    // Redireciona para a tela de login após 3 segundos
-    const timer = setTimeout(() => {
-      navigate('/login');
-    }, 3000); // 3000ms = 3 segundos
-
-    return () => clearTimeout(timer); // Limpa o timer se o componente for desmontado
-  }, [navigate]);
+  // 3. Crie a função para navegar
+  const handleGoToRegister = () => {
+    navigate('/register');
+  };
 
   return (
-    <div>
-   
-     
-      {/* Adiciona um overlay para escurecer a imagem de fundo */}
-      <div className="absolute inset-0 bg-black bg-cover opacity-70 z-0" style={{
-        backgroundImage: `url(${Fundo})`
-      }}></div>
-    
-     <LoginForm />
+    <div
+      className="splash-container" // Use sua classe de estilização
+      style={{ 
+        backgroundImage: `url(${Fundo})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center' 
+      }}
+    >
+      {/* 4. Passe a função 'handleGoToRegister' para a prop 'goToRegister' */}
+      <LoginForm goToRegister={handleGoToRegister} />
     </div>
   );
 };
