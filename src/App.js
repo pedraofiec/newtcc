@@ -24,6 +24,8 @@ import EditProfileScreen from './features/home/components/settings/EditProfileSc
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import RotasPage from './features/rotas/pages/RotasPage';
 
+import StatusModal from './features/shared/components/StatusModal.js';
+
 // 🔔 Toaster (toast com Tailwind) e FCM helpers
 import { Toaster } from 'react-hot-toast';
 import { requestFcmToken, listenForegroundMessages } from './firebase';
@@ -60,6 +62,8 @@ function App() {
         <Route path="/termos-de-uso" element={<TermsOfUseScreen />}  />
       </Routes>
       </Router>
+
+      <StatusModal />
 
       {/* Toaster global para notificações em foreground */}
       <Toaster position="top-right" toastOptions={{ className: 'text-sm' }} />
