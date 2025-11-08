@@ -56,10 +56,10 @@ const LoginForm = ({ goToRegister }) => {
       const response = await LoginService.login({ email, password });
 
       // 2. Salva o token
-      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('accessToken', response.token);
 
       // 3. Decodifica o token para obter os dados do usuário
-      const userData = jwtDecode(response.accessToken);
+      const userData = jwtDecode(response.token);
 
       // 4. Atualiza os stores globais do Zustand
       setAuthData(response); // Salva os dados de autenticação (ex: tokens)
