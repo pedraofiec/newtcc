@@ -8,12 +8,15 @@ import RegisterService from '../service/RegisterService';
 
 // ⚠️ Recebe goToLogin como prop
 const RegisterDriver = ({ goToLogin }) => {
-  const [fullName, setFullName] = React.useState('');
-  const [license, setLicense] = React.useState('');
+  const [nomeMotorista, setNomeMotorista] = React.useState('');
+  const [cnh, setCnh] = React.useState('');
+  const [cpf, setCpf] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [email, setEmail] = React.useState('');
-  
+  const [valCnh, setValCnh] = React.useState('');
+  const [placaVeiculo, setPlacaVeiculo] = React.useState('');
+
   // 💡 NOVOS ESTADOS PARA API
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
@@ -24,11 +27,14 @@ const RegisterDriver = ({ goToLogin }) => {
     setLoading(true);
 
     const data = { 
-      fullName, 
-      license, 
+      nomeMotorista, 
+      cnh, 
+      cpf,
       phone, 
       email, 
-      password 
+      password,
+      placaVeiculo,
+      valCnh
     };
 
     try {
@@ -68,16 +74,24 @@ const RegisterDriver = ({ goToLogin }) => {
           <input
             type="text"
             placeholder="Nome Completo"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={nomeMotorista}
+            onChange={(e) => setNomeMotorista(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Nome CPF"
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
           />
           <input
             type="text"
             placeholder="CNH"
-            value={license}
-            onChange={(e) => setLicense(e.target.value)}
+            value={cnh}
+            onChange={(e) => setCnh(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
           />
@@ -104,7 +118,23 @@ const RegisterDriver = ({ goToLogin }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
+          /><input
+            type="text"
+            placeholder="Validade CNH(2025-11-08)"
+            value={valCnh}
+            onChange={(e) => setValCnh(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
           />
+          <input
+            type="text"
+            placeholder="Placa Do Veiculo"
+            value={placaVeiculo}
+            onChange={(e) => setPlacaVeiculo(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
+          />
+          
 
           <button
             type="submit"

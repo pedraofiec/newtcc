@@ -138,7 +138,7 @@ const UserTypeSelection = () => {
           style={{ ...baseButtonStyle, animation: 'slideInUp 0.5s ease-out 0.3s forwards' }}
         >
           <FaBuilding className="text-5xl text-gray-800 mb-4" />
-          <span className="text-lg font-semibold text-gray-800">Escolar</span>
+          <span className="text-lg font-semibold text-gray-800">Escola</span>
         </button>
       </div>
     </div>

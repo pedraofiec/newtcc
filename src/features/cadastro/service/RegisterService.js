@@ -10,13 +10,13 @@ const RegisterService = {
   
   /**
    * Realiza o cadastro de um novo Motorista.
-   * Rota de API assumida: /v1/api/register/driver
+   * Rota de API assumida: /v1/api/auth/register/motorista
    * @param {object} data - Dados do motorista (nome, cnh, telefone, email, senha).
    * @returns {Promise<object>} - Uma Promise que resolve para os dados do motorista recém-criado.
    */
   async registerDriver(data) {
     try {
-      const response = await api.post('/v1/api/register/driver', data);
+      const response = await api.post('/v1/api/auth/register/motorista', data);
       
       return response.data;
     } catch (error) {

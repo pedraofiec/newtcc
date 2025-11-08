@@ -44,6 +44,7 @@ function App() {
       <Router>
       <Routes>
         <Route path="/" element={<HomeScreen />} />
+        <Route path="/home" element={<HomeScreen />} />
         <Route path="/splash" element={<SplashScreen />} />
         <Route path="/login" element={<SplashScreen />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
