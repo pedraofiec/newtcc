@@ -30,13 +30,13 @@ const RegisterService = {
 
   /**
    * Realiza o cadastro de um novo Responsável.
-   * Rota de API assumida: /v1/api/register/responsible
+   * Rota de API assumida: /v1/api/auth/register/responsavel
    * @param {object} data - Dados do responsável (nome, cpf, telefone, endereço, email, senha).
    * @returns {Promise<object>} - Uma Promise que resolve para os dados do responsável recém-criado.
    */
   async registerResponsible(data) {
     try {
-      const response = await api.post('/v1/api/register/responsible', data);
+      const response = await api.post('/v1/api/auth/register/responsavel', data);
       
       return response.data;
     } catch (error) {

@@ -1,4 +1,3 @@
-// src/features/splash/components/LoginForm.js
 import React from 'react';
 import { FaUser } from 'react-icons/fa6';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -22,6 +21,7 @@ const LoginForm = ({ goToRegister }) => {
   const { setMe } = useUserStore();
   const { setAuthData } = useAuthStore();
 
+  // Obtém o parâmetro 'redirect' da URL, se existir, caso contrário, usa '/home'
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/home';
 
@@ -38,7 +38,7 @@ const LoginForm = ({ goToRegister }) => {
         setAuthData({ accessToken: token }); // Atualiza o auth store
         navigate(redirectTo, { replace: true });
       } catch (e) {
-        // Token inválido, limpa
+        // Token inválido, limpa o token armazenado
         localStorage.removeItem('accessToken');
       }
     }
@@ -88,9 +88,11 @@ const LoginForm = ({ goToRegister }) => {
     >
       <div className="relative w-full max-w-sm p-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-2xl ring-1 ring-white/50">
         <div className="flex justify-center mb-6">
+          {/* Ícone de Usuário */}
           <FaUser className="text-8xl text-gray-800" />
         </div>
 
+        {/* Mensagem de Erro */}
         {error && (
           <div className="mb-4 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
             {error}
@@ -98,6 +100,7 @@ const LoginForm = ({ goToRegister }) => {
         )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Campo de Email */}
           <input
             type="email"
             placeholder="Email"
@@ -108,6 +111,7 @@ const LoginForm = ({ goToRegister }) => {
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-white/80"
           />
 
+          {/* Campo de Senha com Toggle Mostrar/Ocultar */}
           <div className="relative">
             <input
               type={showPass ? 'text' : 'password'}
@@ -121,11 +125,13 @@ const LoginForm = ({ goToRegister }) => {
               type="button"
               onClick={() => setShowPass((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 hover:text-gray-800"
+              aria-label={showPass ? 'Ocultar senha' : 'Mostrar senha'}
             >
               {showPass ? 'Ocultar' : 'Mostrar'}
             </button>
           </div>
 
+          {/* Botão de Login */}
           <button
             type="submit"
             disabled={isSubmitting || !email || !password}
@@ -135,6 +141,7 @@ const LoginForm = ({ goToRegister }) => {
           </button>
         </form>
 
+        {/* Links de Ação */}
         <div className="text-center mt-6 text-gray-700">
           <button
             type="button"

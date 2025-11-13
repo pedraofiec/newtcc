@@ -8,10 +8,9 @@ import RegisterService from '../service/RegisterService';
 
 // ⚠️ Recebe goToLogin como prop
 const RegisterResponsible = ({ goToLogin }) => {
-  const [fullName, setFullName] = React.useState('');
-  const [cpf, setCpf] = React.useState('');
-  const [phone, setPhone] = React.useState('');
-  const [address, setAddress] = React.useState('');
+  const [nomeResponsavel, setNomeResponsavel] = React.useState('');
+  const [cpfResponsavel, setCpfResponsavel] = React.useState('');
+  const [EnderecoCasa, setEnderecoCasa] = React.useState('');
   const [email, setEmail] = React.useState(''); 
   const [password, setPassword] = React.useState(''); 
   
@@ -24,10 +23,9 @@ const RegisterResponsible = ({ goToLogin }) => {
     setLoading(true);
 
     const data = { 
-      fullName, 
-      cpf, 
-      phone, 
-      address, 
+      nomeResponsavel, 
+      cpfResponsavel, 
+      EnderecoCasa, 
       email, 
       password 
     };
@@ -64,32 +62,24 @@ const RegisterResponsible = ({ goToLogin }) => {
           <input
             type="text"
             placeholder="Nome Completo"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={nomeResponsavel}
+            onChange={(e) => setNomeResponsavel(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
           />
           <input
             type="text"
             placeholder="CPF"
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Telefone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={cpfResponsavel}
+            onChange={(e) => setCpfResponsavel(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
           />
           <input
             type="text"
             placeholder="Endereço Completo"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            value={EnderecoCasa}
+            onChange={(e) => setEnderecoCasa(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
           />

@@ -1,7 +1,7 @@
 // src/components/layout/LayoutComponents.js
 
 import React from "react";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, Outlet } from "react-router-dom"; // <-- adicionado Outlet
 import { 
     FaUserCircle, 
     FaSignOutAlt, 
@@ -19,31 +19,34 @@ import { MdOutlineDashboard } from "react-icons/md";
 
 /* ============== Header ============== */
 export const Header = () => {
-    // Componente de layout simples. A lógica de logout ficaria aqui se necessário.
     const navigate = useNavigate(); 
     
     return (
-        <header className="sticky top-0 z-30 w-full border-b border-slate-100 bg-white shadow-sm h-16">
+        <header className="fixed top-0 z-30 w-full border-b border-slate-100 bg-[#8AD7E1] shadow-sm h-16">
             <div className="flex w-full items-center justify-between px-4 py-3 md:px-8">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#8AD7E1] shadow-lg">
-                        <span className="text-xl text-white font-bold">🚐</span>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-lg">
+                        <span className="text-xl text-[#8AD7E1] font-bold">🚐</span>
                     </div>
-                    <span className="text-xl font-extrabold tracking-tight text-slate-800">
+                    <span className="text-xl font-extrabold tracking-tight text-white">
                         ROTAVAN
                     </span>
                 </div>
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate("/perfil")}
-                        className="flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm text-slate-700 hover:bg-gray-100 transition duration-150"
+                        onClick={() => navigate("/settings/perfil")}
+                        className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition duration-150"
                     >
                         <FaUserCircle className="w-5 h-5" />
                         Perfil
                     </button>
                     <button 
-                        onClick={() => {/* Lógica de Logout */}} 
-                        className="text-slate-500 hover:text-red-500"
+                        onClick={() => {
+                            // Lógica simples de logout
+                            localStorage.removeItem("accessToken");
+                            window.location.href = "/#/login";
+                        }} 
+                        className="text-white hover:text-red-100"
                     >
                         <FaSignOutAlt className="w-5 h-5" />
                     </button>
@@ -56,12 +59,11 @@ export const Header = () => {
 
 /* ============== SideBar ============== */
 export const SideBar = () => {
-    // Função para determinar o estilo do NavLink
     const linkClasses = ({ isActive }) =>
         `flex items-center gap-3 p-3 rounded-lg transition duration-150 ${
             isActive
                 ? "bg-[#8AD7E1] text-white font-semibold shadow-md"
-                : "text-slate-700 hover:bg-gray-100"
+                : "text-slate-700 hover:bg-slate-100"
         }`;
 
     return (
@@ -70,19 +72,40 @@ export const SideBar = () => {
         >
             <div className="flex flex-col gap-2">
                 <NavLink to="/home" className={linkClasses}>
-                    <MdOutlineDashboard className="w-5 h-5" /> Dashboard
+                    <MdOutlineDashboard className="w-5 h-5" /> Página inicial
+                </NavLink>
+                <NavLink to="/driver/manage-students" className={linkClasses}>
+                    <FaUser className="w-5 h-5" /> Solicitações
+                </NavLink>
+                <NavLink to="/settings/perfil" className={linkClasses}>
+                    <FaUserCircle className="w-5 h-5" /> Perfil
                 </NavLink>
                 <NavLink to="/rotas" className={linkClasses}>
-                    <FaMapMarkedAlt className="w-5 h-5" /> Rotas
-                </NavLink>
-                <NavLink to="/veiculos" className={linkClasses}>
-                    <FaCar className="w-5 h-5" /> Veículos
-                </NavLink>
-                <NavLink to="/settings" className={linkClasses}>
-                    <FaCog className="w-5 h-5" /> Configurações
+                    <FaMapMarkedAlt className="w-5 h-5" /> Rota
                 </NavLink>
             </div>
-            {/* Outros links da SideBar, se houver */}
         </nav>
+    );
+};
+
+/* ============== Layout completo (Header + SideBar + Conteúdo) ============== */
+export const DashboardLayout = () => {
+    return (
+        <div className="min-h-screen bg-slate-50">
+            {/* Header fixo no topo */}
+            <Header />
+
+            <div className="flex">
+                {/* Sidebar fixa à esquerda (somente em telas grandes) */}
+                <SideBar />
+
+                {/* Área de conteúdo: padding-top para não ficar atrás do header,
+                    margin-left em telas grandes para não ficar atrás da sidebar */}
+                <main className="flex-1 pt-20 px-4 pb-8 lg:ml-60 md:px-8">
+                    {/* Aqui entram as páginas (home, rota, etc) */}
+                    <Outlet />
+                </main>
+            </div>
+        </div>
     );
 };
