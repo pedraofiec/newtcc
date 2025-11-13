@@ -1,33 +1,27 @@
+// src/components/Layout.jsx
 import React from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-// 
-// IMPORTANTE: Como a sua versão original usa FaCog, FaMapMarkedAlt, FaCar, FaUserCircle
-// e MdOutlineDashboard, eu assumo que você tem essas dependências instaladas.
-// Vamos usar os componentes de ícone do react-icons (se você os tem) e os SVGs que você 
-// definiu como fallback para os ícones que não são do react-icons.
-// 
-
-// Importa ícones do react-icons
+// Importações de Icones (Certifique-se que 'react-icons' está instalado)
 import { FaCog, FaMapMarkedAlt, FaCar, FaUserCircle } from "react-icons/fa";
 import { MdOutlineDashboard } from "react-icons/md";
 
 // --------------------------------------------------------------------------------------
-// ÍCONES SVG INLINE (Adaptados da sua versão para serem reusados aqui)
+// ÍCONES SVG INLINE (Para evitar quebras onde react-icons não foi totalmente configurado)
 // --------------------------------------------------------------------------------------
-
-// Equivalente a FaUserCircle
-const IconUserCircle = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-);
 
 // Equivalente a FaSignOutAlt (LogOut)
 const IconSignOut = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
 );
+
+// Equivalente a FaUserCircle
+const IconUserCircle = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+);
 // --------------------------------------------------------------------------------------
 
 
-/* Header (MOVIDO DA SUA VERSÃO DE HomeScreen.jsx) */
+/* Header (MOVIDO DE HomeScreen.js) */
 const Header = () => {
     const navigate = useNavigate();
     
@@ -52,15 +46,13 @@ const Header = () => {
                         onClick={() => navigate("/perfil")}
                         className="flex items-center gap-2 rounded-full border border-gray-200 px-4 py-1.5 text-sm text-slate-700 hover:bg-gray-100 transition duration-150"
                     >
-                        {/* Usando o IconUserCircle inline */}
                         <IconUserCircle className="w-4 h-4 text-slate-500" />
                         Perfil
                     </button>
                     <button
-                        onClick={handleLogout} // Usando handleLogout para ir para /login
+                        onClick={handleLogout}
                         className="flex items-center rounded-full bg-red-500 px-4 py-1.5 text-sm text-white shadow hover:bg-red-600 transition duration-150"
                     >
-                        {/* Usando o IconSignOut inline */}
                         <IconSignOut className="mr-2 w-4 h-4" />
                         Sair
                     </button>
@@ -70,10 +62,10 @@ const Header = () => {
     );
 };
 
-/* SideBar (MOVIDO DA SUA VERSÃO DE HomeScreen.jsx) */
+/* SideBar (MOVIDO DE HomeScreen.js) */
 const SideBar = () => {
-    // Definindo o target como /home para o Dashboard (que agora será o UserHomeRouter)
     const navItems = [
+        // Usando os ícones importados do react-icons
         { name: "Dashboard", path: "/home", icon: MdOutlineDashboard }, 
         { name: "Rotas", path: "/rotas", icon: FaMapMarkedAlt },
         { name: "Motoristas", path: "/motoristas", icon: FaCar },
@@ -96,7 +88,6 @@ const SideBar = () => {
                                         : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                                 }`
                             }
-                            // Usar 'end' é crucial para o link /home não marcar todos como ativos
                             end={item.path === "/home"}
                         >
                             <IconComponent className="w-5 h-5" />
@@ -107,7 +98,6 @@ const SideBar = () => {
             </nav>
 
             <div className="mt-8 border-t border-slate-100 p-4 md:p-6">
-                {/* O link de configurações */}
                 <NavLink
                     to="/settings"
                     className="flex items-center gap-3 w-full rounded-lg px-4 py-3 text-left text-slate-600 hover:bg-slate-100 transition duration-150"

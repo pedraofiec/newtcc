@@ -12,7 +12,6 @@ const RegisterSchool = ({ goToLogin }) => {
   const [address, setAddress] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 

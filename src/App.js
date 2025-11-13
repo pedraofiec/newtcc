@@ -1,72 +1,93 @@
-// src/App.js
 import React, { useEffect } from 'react';
 
 // Importa os componentes de cada funcionalidade
-import HomeScreen from './features/home/components/HomeScreen';
+import HomeScreen from './features/home/components/HomeScreen'; // se for usar para outros perfis depois
 import SplashScreen from './features/splash/SplashScreen';
-import LoginForm from './features/splash/components/LoginForm';
 import UserTypeSelection from './features/splash/components/UserTypeSelection';
 import ForgotPassword from './features/splash/components/ForgotPassword';
 
-// Importa os componentes de cadastro
+// Guarda de rota para motorista
+import DriverRouteGuard from './features/motorista/components/DriverRouteGuard.js';
+
+// Componentes de cadastro
 import RegisterResponsible from './features/cadastro/components/RegisterResponsible';
 import RegisterDriver from './features/cadastro/components/RegisterDriver';
 import RegisterSchool from './features/cadastro/components/RegisterSchool';
 import RegisterStudent from './features/cadastro/components/RegisterStudent';
-import DriverProfile from './features/motorista/components/DriverProfile';
-import DriverScreen from './features/motorista/components/DriverScreen';
-import SettingsScreen from './features/home/components/SettingsScreen.js';
 
+// Telas de motorista
+import RouteManagementScreen from './features/motorista/components/RouteManagementScreen.js';
+import StudentAssignmentScreen from './features/motorista/components/StudentAssignmentScreen.js';
+import DriverScreen from './features/motorista/components/DriverScreen';
+
+// Telas de configurações
+import SettingsScreen from './features/home/components/SettingsScreen.js';
 import ChangePasswordScreen from './features/home/components/settings/ChangePasswordScreen.js';
 import TermsOfUseScreen from './features/home/components/settings/TermsOfUseScreen.js';
 import EditProfileScreen from './features/home/components/settings/EditProfileScreen.js';
 
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+// Rotas gerais
 import RotasPage from './features/rotas/pages/RotasPage';
 
-import StatusModal from './features/shared/components/StatusModal.js';
+// Layout (Header + Sidebar)
+import { DashboardLayout } from './features/home/components/layout/LayoutComponents.js';
 
-// 🔔 Toaster (toast com Tailwind) e FCM helpers
+// Router
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+
+// Status modal e toaster
+import StatusModal from './features/shared/components/StatusModal.js';
 import { Toaster } from 'react-hot-toast';
 import { requestFcmToken, listenForegroundMessages } from './firebase';
 
 function App() {
-  // Bootstrap das notificações (foreground + token via VAPID)
   useEffect(() => {
     (async () => {
-      await requestFcmToken();          // usa VITE_FIREBASE_VAPID_KEY, se definido
-      await listenForegroundMessages(); // exibe toast quando a aba estiver ativa
+      await requestFcmToken();
+      await listenForegroundMessages();
     })();
   }, []);
 
   return (
     <div className="App">
       <Router>
-      <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/home" element={<HomeScreen />} />
-        <Route path="/splash" element={<SplashScreen />} />
-        <Route path="/login" element={<SplashScreen />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/register" element={<UserTypeSelection />} />
-        <Route path="/register/responsible" element={<RegisterResponsible />} />
-        <Route path="/register/driver" element={<RegisterDriver />} />
-        <Route path="/register/school" element={<RegisterSchool />} />
-        <Route path="/register/student" element={<RegisterStudent />} />
-        <Route path="/motoristas" element={<DriverScreen />} />
-        <Route path="/motoristas/:id" element={<DriverProfile />} />
-        <Route path="/rotas" element={<RotasPage />} />
+        <Routes>
+          {/* Rotas públicas */}
+          <Route path="/" element={<SplashScreen />} />
+          <Route path="/login" element={<SplashScreen />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/register" element={<UserTypeSelection />} />
+          <Route path="/register/responsible" element={<RegisterResponsible />} />
+          <Route path="/register/driver" element={<RegisterDriver />} />
+          <Route path="/register/school" element={<RegisterSchool />} />
+          <Route path="/register/student" element={<RegisterStudent />} />
 
-        <Route path="/settings" element={<SettingsScreen />} />
-        <Route path="/settings/perfil" element={<EditProfileScreen />}  />
-        <Route path="/settings/alterar-senha" element={<ChangePasswordScreen />}  />
-        <Route path="/termos-de-uso" element={<TermsOfUseScreen />}  />
-      </Routes>
+          {/* Rotas protegidas para MOTORISTA */}
+          <Route element={<DriverRouteGuard />}>
+            {/* Layout comum (header + sidebar) */}
+            <Route element={<DashboardLayout />}>
+              {/* Página inicial do motorista (passageiros, cards, etc.) */}
+              <Route path="/home" element={<DriverScreen />} />
+
+              {/* Solicitações - você pode apontar para StudentAssignmentScreen, por exemplo */}
+              <Route path="/driver/manage-students" element={<StudentAssignmentScreen />} />
+
+              {/* Rotas */}
+              <Route path="/driver/manage-route" element={<RouteManagementScreen />} />
+              <Route path="/rotas" element={<RotasPage />} />
+
+              {/* Configurações */}
+              <Route path="/settings" element={<SettingsScreen />} />
+              <Route path="/settings/perfil" element={<EditProfileScreen />} />
+              <Route path="/settings/alterar-senha" element={<ChangePasswordScreen />} />
+              <Route path="/termos-de-uso" element={<TermsOfUseScreen />} />
+            </Route>
+          </Route>
+        </Routes>
       </Router>
 
       <StatusModal />
 
-      {/* Toaster global para notificações em foreground */}
       <Toaster position="top-right" toastOptions={{ className: 'text-sm' }} />
     </div>
   );
