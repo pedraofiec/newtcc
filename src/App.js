@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useEffect } from 'react';
 
 // Importa os componentes de cada funcionalidade
@@ -19,6 +20,7 @@ import RegisterStudent from './features/cadastro/components/RegisterStudent';
 import RouteManagementScreen from './features/motorista/components/RouteManagementScreen.js';
 import StudentAssignmentScreen from './features/motorista/components/StudentAssignmentScreen.js';
 import DriverScreen from './features/motorista/components/DriverScreen';
+import PassengerProfileScreen from './features/motorista/components/PassengerProfileScreen.js';
 
 // Telas de configurações
 import SettingsScreen from './features/home/components/SettingsScreen.js';
@@ -52,7 +54,7 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          {/* Rotas públicas */}
+          {/* 🔓 Rotas públicas (login / cadastro) */}
           <Route path="/" element={<SplashScreen />} />
           <Route path="/login" element={<SplashScreen />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -62,24 +64,39 @@ function App() {
           <Route path="/register/school" element={<RegisterSchool />} />
           <Route path="/register/student" element={<RegisterStudent />} />
 
-          {/* Rotas protegidas para MOTORISTA */}
+          {/* 🔒 Rotas protegidas para MOTORISTA */}
           <Route element={<DriverRouteGuard />}>
             {/* Layout comum (header + sidebar) */}
             <Route element={<DashboardLayout />}>
-              {/* Página inicial do motorista (passageiros, cards, etc.) */}
+              {/* Página inicial do motorista (cards de passageiros) */}
               <Route path="/home" element={<DriverScreen />} />
 
-              {/* Solicitações - você pode apontar para StudentAssignmentScreen, por exemplo */}
-              <Route path="/driver/manage-students" element={<StudentAssignmentScreen />} />
+              {/* Perfil do passageiro (acesso pelo botão "Visualizar perfil") */}
+              <Route
+                path="/driver/passengers/:id"
+                element={<PassengerProfileScreen />}
+              />
 
-              {/* Rotas */}
-              <Route path="/driver/manage-route" element={<RouteManagementScreen />} />
+              {/* Solicitações / gerenciamento de alunos na rota */}
+              <Route
+                path="/driver/manage-students"
+                element={<StudentAssignmentScreen />}
+              />
+
+              {/* Rotas do motorista */}
+              <Route
+                path="/driver/manage-route"
+                element={<RouteManagementScreen />}
+              />
               <Route path="/rotas" element={<RotasPage />} />
 
-              {/* Configurações */}
+              {/* Configurações / Perfil */}
               <Route path="/settings" element={<SettingsScreen />} />
               <Route path="/settings/perfil" element={<EditProfileScreen />} />
-              <Route path="/settings/alterar-senha" element={<ChangePasswordScreen />} />
+              <Route
+                path="/settings/alterar-senha"
+                element={<ChangePasswordScreen />}
+              />
               <Route path="/termos-de-uso" element={<TermsOfUseScreen />} />
             </Route>
           </Route>
@@ -87,7 +104,6 @@ function App() {
       </Router>
 
       <StatusModal />
-
       <Toaster position="top-right" toastOptions={{ className: 'text-sm' }} />
     </div>
   );

@@ -1,262 +1,163 @@
-// src/features/rotas/pages/RotasPage.jsx
-import React, {
-  useMemo,
-  useState,
-  useRef,
-  useLayoutEffect,
-} from "react";
-import { useNavigate } from "react-router-dom";
-import { FaRoute, FaChevronLeft } from "react-icons/fa";
-import RouteMap from "../components/RouteMap";
-import { defaultWaypoints } from "../services/route.waypoints";
-import { geocodeAddress } from "../services/geocode";
+// src/features/rotas/pages/RotasPage.js
+import React, { useState } from "react";
+import { FaChevronLeft, FaRoute, FaBus } from "react-icons/fa";
+import { MapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
-/* Pill de resumo */
-function InfoPill({ label, value }) {
-  return (
-    <div className="px-3 py-1 rounded-full bg-[#d7f5f8] text-[#02343F] text-xs md:text-sm font-medium shadow-sm">
-      <span className="opacity-75 mr-1">{label}:</span>
-      {value}
-    </div>
-  );
-}
+const RotasPage = () => {
+  // null = ainda não escolheu / ida / volta
+  const [direction, setDirection] = useState(null); // "ida" | "volta" | null
 
-export default function RotasPage() {
-  const navigate = useNavigate();
-
-  // Waypoints + resumo
-  const [wps, setWps] = useState(defaultWaypoints.slice(0, 2));
-  const [summary, setSummary] = useState({
-    distanceMeters: 0,
-    durationSeconds: 0,
-  });
-
-  // Busca
-  const [originQuery, setOriginQuery] = useState("");
-  const [destQuery, setDestQuery] = useState("");
-
-  // Simulação
-  const [simKey, setSimKey] = useState(0);
-  const [stopKey, setStopKey] = useState(0);
-
-  // Clique no mapa
-  const [clickMode, setClickMode] = useState(null); // 'origin' | 'destination' | null
-
-  // altura dinâmica do mapa
-  const headerH = 64;
-  const pagePadding = 24;
-  const controlsRef = useRef(null);
-  const [mapHeight, setMapHeight] = useState(420);
-
-  useLayoutEffect(() => {
-    function recalc() {
-      const vh = window.innerHeight;
-      const controlsH =
-        controlsRef.current?.getBoundingClientRect().height ?? 140;
-      const reserved = headerH + pagePadding + controlsH + 90;
-      const h = Math.max(320, vh - reserved);
-      setMapHeight(h);
-    }
-    recalc();
-    window.addEventListener("resize", recalc);
-    return () => window.removeEventListener("resize", recalc);
-  }, []);
-
-  const fmt = useMemo(
-    () => ({
-      dist: (m) => (m ? `${(m / 1000).toFixed(1)} km` : "—"),
-      dur: (s) => {
-        if (!s) return "—";
-        const min = Math.round(s / 60);
-        if (min < 60) return `${min} min`;
-        const h = Math.floor(min / 60);
-        const r = min % 60;
-        return `${h}h ${r}min`;
-      },
-    }),
-    []
-  );
-
-  async function traceBySearch() {
-    const [o, d] = await Promise.all([
-      geocodeAddress(originQuery),
-      geocodeAddress(destQuery),
-    ]);
-    if (!o || !d) {
-      alert(
-        "Não foi possível localizar um dos endereços. Tente ser mais específico."
-      );
-      return;
-    }
-    setWps([o, d]);
-    setClickMode(null);
-  }
-
-  function resetAll() {
-    setWps([]);
-    setClickMode(null);
-    setStopKey((v) => v + 1);
-    setOriginQuery("");
-    setDestQuery("");
-    setSummary({
-      distanceMeters: 0,
-      durationSeconds: 0,
-    });
-  }
+  const handleBackToSelection = () => {
+    setDirection(null);
+  };
 
   return (
-    <div className="w-full flex flex-col items-center font-sans">
-      <div className="w-full max-w-6xl mt-6 px-4 md:px-0">
-        {/* topo – link de voltar + título */}
-        <button
-                onClick={() => navigate('/home')}
-                className="flex items-center text-blue-600 hover:text-blue-800 mb-6 font-medium"
-              >
-                <FaChevronLeft className="mr-2" /> Voltar a Página Inicial
-              </button>
+    <div className="w-full p-6">
+      {/* Topo: voltar + título geral da página */}
+      <button
+        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4 text-sm font-medium"
+        onClick={() => window.history.back()}
+      >
+        <FaChevronLeft /> Voltar à Página Inicial
+      </button>
 
-        <div className="flex items-center gap-2 mb-2">
-          <FaRoute className="text-2xl text-[#8AD7E1]" />
-          <h1 className="text-2xl md:text-3xl font-semibold text-slate-800">
-            Gerenciamento de Rotas
-          </h1>
+      {/* Título estilo "Gerenciamento..." */}
+      <div className="flex items-center gap-2 mb-2">
+        <FaRoute className="text-xl text-[#8AD7E1]" />
+        <h1 className="text-2xl md:text-3xl font-semibold text-slate-800">
+          Gerenciamento de Rotas
+        </h1>
+      </div>
+      <p className="text-sm text-slate-500 mb-6">
+        Escolha se deseja visualizar a rota de ida ou de volta e veja o mapa
+        sugerido para o trajeto escolar.
+      </p>
+
+      {/* Pílula "ROTA" centralizada (igual Figma) */}
+      <div className="w-full flex justify-center mb-8">
+        <div className="inline-flex px-10 py-2 rounded-full bg-[#8AD7E1] shadow-sm">
+          <span className="text-sm md:text-base font-semibold tracking-wide text-slate-800">
+            ROTA
+          </span>
         </div>
-        <p className="text-sm text-slate-500 mb-4">
-          Defina origem, destino e visualize o trajeto sugerido para sua rota
-          escolar.
-        </p>
-        <hr className="border-slate-200 mb-5" />
+      </div>
 
-        {/* card principal */}
-        <div className="bg-white rounded-3xl shadow-md p-4 md:p-6 mb-6">
-          {/* controles */}
-          <div ref={controlsRef} className="mb-4">
-            <div className="grid gap-4 md:grid-cols-[1.2fr_1.2fr_auto] md:items-end">
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  Origem
-                </label>
-                <input
-                  value={originQuery}
-                  onChange={(e) => setOriginQuery(e.target.value)}
-                  placeholder="Digite um endereço ou clique em 'Definir no mapa'"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 h-10 text-sm shadow-sm focus:ring-2 focus:ring-[#8AD7E1] focus:border-[#8AD7E1] outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setClickMode(clickMode === "origin" ? null : "origin")
-                  }
-                  className={`mt-2 text-[11px] rounded-full px-3 py-1 border ${
-                    clickMode === "origin"
-                      ? "bg-slate-800 text-white"
-                      : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                  }`}
-                >
-                  {clickMode === "origin"
-                    ? "Clique no mapa para definir a origem"
-                    : "Definir origem no mapa"}
-                </button>
+      {/* === PASSO 1: ESCOLHER IDA / VOLTA === */}
+      {direction === null && (
+        <div className="flex flex-col items-center gap-12 mt-4">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-16">
+            {/* Bloco IDA */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-24 h-24 rounded-3xl bg-slate-100 flex items-center justify-center shadow-md">
+                <FaBus className="text-5xl text-slate-800" />
               </div>
+              <button
+                onClick={() => setDirection("ida")}
+                className="px-8 py-2 rounded-full bg-[#8AD7E1] text-sm font-semibold text-white shadow hover:bg-[#78c9d4] transition"
+              >
+                IDA
+              </button>
+            </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                  Destino
-                </label>
-                <input
-                  value={destQuery}
-                  onChange={(e) => setDestQuery(e.target.value)}
-                  placeholder="Digite um endereço ou clique em 'Definir no mapa'"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 h-10 text-sm shadow-sm focus:ring-2 focus:ring-[#8AD7E1] focus:border-[#8AD7E1] outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setClickMode(
-                      clickMode === "destination" ? null : "destination"
-                    )
-                  }
-                  className={`mt-2 text-[11px] rounded-full px-3 py-1 border ${
-                    clickMode === "destination"
-                      ? "bg-slate-800 text-white"
-                      : "border-slate-300 text-slate-700 hover:bg-slate-50"
-                  }`}
-                >
-                  {clickMode === "destination"
-                    ? "Clique no mapa para definir o destino"
-                    : "Definir destino no mapa"}
-                </button>
+            {/* Bloco VOLTA */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-24 h-24 rounded-3xl bg-slate-100 flex items-center justify-center shadow-md">
+                <FaBus className="text-5xl text-slate-800" />
               </div>
-
-              <div className="flex flex-col gap-2 md:items-end">
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={traceBySearch}
-                    className="h-10 rounded-full bg-[#8AD7E1] text-[#02343F] px-4 text-sm font-semibold hover:opacity-90"
-                  >
-                    Traçar Rota
-                  </button>
-                  <button
-                    type="button"
-                    onClick={resetAll}
-                    className="h-10 rounded-full border border-slate-300 text-slate-700 px-4 text-sm font-medium hover:bg-slate-50"
-                  >
-                    Limpar
-                  </button>
-                </div>
-                <div className="flex gap-2 mt-1 flex-wrap justify-end">
-                  <InfoPill
-                    label="Tempo estimado"
-                    value={fmt.dur(summary.durationSeconds)}
-                  />
-                  <InfoPill
-                    label="Distância"
-                    value={fmt.dist(summary.distanceMeters)}
-                  />
-                </div>
-              </div>
+              <button
+                onClick={() => setDirection("volta")}
+                className="px-8 py-2 rounded-full bg-[#8AD7E1] text-sm font-semibold text-white shadow hover:bg-[#78c9d4] transition"
+              >
+                VOLTA
+              </button>
             </div>
           </div>
 
-          {/* mapa */}
-          <div className="rounded-2xl overflow-hidden border border-slate-100">
-            <RouteMap
-              waypoints={wps}
-              onWaypointsChange={setWps}
-              onSummary={setSummary}
-              onPickDone={() => setClickMode(null)}
-              height={mapHeight}
-              startSim={simKey}
-              stopSim={stopKey}
-              allowClickSet={clickMode}
-            />
-          </div>
+          <p className="text-xs text-slate-500 text-center max-w-md">
+            Toque em <strong>IDA</strong> ou <strong>VOLTA</strong> para
+            visualizar a rota correspondente no mapa.
+          </p>
+        </div>
+      )}
 
-          {/* ações */}
-          <div className="mt-4 flex flex-wrap gap-2 items-center">
-            <button
-              type="button"
-              onClick={() => setSimKey((v) => v + 1)}
-              className="px-4 py-2 rounded-full bg-[#8AD7E1] text-[#02343F] text-sm font-semibold hover:opacity-90 disabled:opacity-50"
-              disabled={!(wps && wps.length >= 2)}
-            >
-              Iniciar Rota
-            </button>
-            <button
-              type="button"
-              onClick={() => setStopKey((v) => v + 1)}
-              className="px-4 py-2 rounded-full border border-[#8AD7E1] text-[#02343F] text-sm font-medium hover:bg-[#f6fbfc]"
-            >
-              Parar
-            </button>
-            <span className="text-[11px] text-slate-500 mt-1">
-              Dica: você pode <b>arrastar os pinos</b> para ajustar o caminho da
-              rota.
-            </span>
+      {/* === PASSO 2: MOSTRAR MAPA DA ROTA === */}
+      {direction !== null && (
+        <div className="flex flex-col items-center mt-2">
+          {/* Card colorido com mapa dentro (estilo Figma) */}
+          <div className="bg-[#8AD7E1] rounded-3xl shadow-lg p-6 md:p-8 w-full max-w-5xl">
+            {/* Header do card */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">
+                  Rota de {direction === "ida" ? "ida" : "volta"}
+                </h2>
+                <p className="text-xs text-slate-700">
+                  Visualização aproximada do trajeto da linha escolar na{" "}
+                  {direction === "ida" ? "ida até a escola." : "volta para casa."}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 justify-end">
+                <button
+                  onClick={handleBackToSelection}
+                  className="px-4 py-1.5 rounded-full text-xs font-semibold border border-white text-white/90 hover:bg-white/10"
+                >
+                  Trocar direção
+                </button>
+              </div>
+            </div>
+
+            {/* Tabs visuais IDA / VOLTA (não trocam rota, só feedback visual) */}
+            <div className="flex gap-4 mb-4">
+              <button
+                className={`flex-1 py-2 rounded-full text-xs md:text-sm font-semibold ${
+                  direction === "ida"
+                    ? "bg-[#42c5dd] text-white"
+                    : "bg-[#CFF4F7] text-slate-700"
+                }`}
+                onClick={() => setDirection("ida")}
+              >
+                Rota de ida
+              </button>
+              <button
+                className={`flex-1 py-2 rounded-full text-xs md:text-sm font-semibold ${
+                  direction === "volta"
+                    ? "bg-[#42c5dd] text-white"
+                    : "bg-[#CFF4F7] text-slate-700"
+                }`}
+                onClick={() => setDirection("volta")}
+              >
+                Rota de volta
+              </button>
+            </div>
+
+            {/* MAPA */}
+            <div className="w-full h-80 bg-white rounded-3xl overflow-hidden shadow-inner">
+              <MapContainer
+                center={[-23.092, -47.219]} // região de Indaiatuba (aprox.)
+                zoom={13}
+                scrollWheelZoom={false}
+                className="w-full h-full"
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+              </MapContainer>
+            </div>
+
+            {/* Texto explicativo embaixo do mapa */}
+            <div className="mt-4 text-xs text-slate-700 text-center">
+              Tempo estimado e distância podem ser ajustados na integração
+              futura com um serviço de rotas (Google Maps, OpenStreetMap,
+              etc.). Esta visualização serve como referência do trajeto.
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
-}
+};
+
+export default RotasPage;
