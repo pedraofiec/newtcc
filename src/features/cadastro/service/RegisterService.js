@@ -36,6 +36,7 @@ const RegisterService = {
    */
   async registerResponsible(data) {
     try {
+      console.log("DATA ENVIADO", data);
       const response = await api.post('/v1/api/auth/register/responsavel', data);
       
       return response.data;

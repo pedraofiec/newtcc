@@ -2,13 +2,14 @@
 import React, { useEffect } from 'react';
 
 // Importa os componentes de cada funcionalidade
-import HomeScreen from './features/home/components/HomeScreen'; // se for usar para outros perfis depois
+import HomeScreen from './features/home/components/HomeScreen';
 import SplashScreen from './features/splash/SplashScreen';
 import UserTypeSelection from './features/splash/components/UserTypeSelection';
 import ForgotPassword from './features/splash/components/ForgotPassword';
 
 // Guarda de rota para motorista
 import DriverRouteGuard from './features/motorista/components/DriverRouteGuard.js';
+
 
 // Componentes de cadastro
 import RegisterResponsible from './features/cadastro/components/RegisterResponsible';
@@ -21,6 +22,14 @@ import RouteManagementScreen from './features/motorista/components/RouteManageme
 import StudentAssignmentScreen from './features/motorista/components/StudentAssignmentScreen.js';
 import DriverScreen from './features/motorista/components/DriverScreen';
 import PassengerProfileScreen from './features/motorista/components/PassengerProfileScreen.js';
+
+// Telas de responsável (NOVAS)
+import DependentesScreen from './features/responsavel/components/DependentesScreen';
+import EncontrarMotoristasScreen from './features/responsavel/components/EncontrarMotoristasScreen';
+import StudentProfileScreen from './features/responsavel/components/StudentProfileScreen.js';
+import ResponsavelProfileScreen from './features/responsavel/components/ResponsavelProfileScreen.js';
+import ResponsavelLayout from './features/responsavel/components/layout/ResponsavelLayout';
+
 
 // Telas de configurações
 import SettingsScreen from './features/home/components/SettingsScreen.js';
@@ -44,7 +53,8 @@ import { requestFcmToken, listenForegroundMessages } from './firebase';
 import useUserStore from './features/shared/store/user-store.js';
 
 function App() {
-  const {tipo, info} = useUserStore()
+  const { tipo } = useUserStore();
+
   useEffect(() => {
     (async () => {
       await requestFcmToken();
@@ -56,7 +66,7 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          {/* 🔓 Rotas públicas (login / cadastro) */}
+          {/* 🔓 Rotas públicas */}
           <Route path="/" element={<SplashScreen />} />
           <Route path="/login" element={<SplashScreen />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -65,54 +75,59 @@ function App() {
           <Route path="/register/driver" element={<RegisterDriver />} />
           <Route path="/register/school" element={<RegisterSchool />} />
           <Route path="/register/student" element={<RegisterStudent />} />
-          
 
+          {/* ====================================================================================== */}
+          {/* 🔒 ROTAS EXCLUSIVAS DO MOTORISTA */}
+          {/* ====================================================================================== */}
 
+          {tipo === "ROLE_MOTORISTA" && (
+            <Route path="/" element={<DashboardLayout />}>
 
-            {tipo && tipo=="ROLE_MOTORISTA" &&  <Route path="/" element = {<DashboardLayout />}>
-              
-              {/* Página inicial do motorista (cards de passageiros) */}
+              {/* Home do motorista */}
               <Route path="/home" element={<DriverScreen />} />
 
-              {/* Perfil do passageiro (acesso pelo botão "Visualizar perfil") */}
-               
-              <Route
-                path="/driver/passengers/:id"
-                element={<PassengerProfileScreen />}
-              />
+              {/* Perfil do passageiro */}
+              <Route path="/driver/passengers/:id" element={<PassengerProfileScreen />} />
 
-              {/* Solicitações / gerenciamento de alunos na rota */}
-              <Route
-                path="/driver/manage-students"
-                element={<StudentAssignmentScreen />}
-              />
+              {/* Gerenciamento de alunos */}
+              <Route path="/driver/manage-students" element={<StudentAssignmentScreen />} />
 
-              {/* Rotas do motorista */}
-              <Route
-                path="/driver/manage-route"
-                element={<RouteManagementScreen />}
-              />
-            
-              <Route path="/settings" element={<SettingsScreen />} />
-              </Route>}
+              {/* Gerenciamento da rota */}
+              <Route path="/driver/manage-route" element={<RouteManagementScreen />} />
 
-          {/* 🔒 Rotas protegidas para MOTORISTA */}
-          <Route element={<DriverRouteGuard />}>
-            {/* Layout comum (header + sidebar) */}
-            <Route element={<DashboardLayout />}>
-           
-              <Route path="/rotas" element={<RotasPage />} />
-
-              {/* Configurações / Perfil */}
+              {/* Configurações */}
               <Route path="/settings" element={<SettingsScreen />} />
               <Route path="/settings/perfil" element={<EditProfileScreen />} />
-              <Route
-                path="/settings/alterar-senha"
-                element={<ChangePasswordScreen />}
-              />
-              <Route path="/termos-de-uso" element={<TermsOfUseScreen />} />
+              <Route path="/settings/alterar-senha" element={<ChangePasswordScreen />} />
+              <Route path="/rotas" element={<RotasPage />} />
             </Route>
-          </Route>
+          )}
+
+          {/* 🔒 ROTAS EXCLUSIVAS DO RESPONSÁVEL */}
+          {tipo === "ROLE_RESPONSAVEL" && (
+            <Route path="/" element={<ResponsavelLayout />}>
+
+              {/* Home do responsável */}
+              <Route index element={<DependentesScreen />} />
+              <Route path="home" element={<DependentesScreen />} />
+
+              {/* Solicitações = EncontrarMotoristas */}
+              <Route path="solicitacoes" element={<EncontrarMotoristasScreen />} />
+              {/* (se em algum lugar você ainda usar /encontrar-motoristas, também deixo funcionando) */}
+              <Route path="encontrar-motoristas" element={<EncontrarMotoristasScreen />} />
+
+              {/* Perfil do dependente */}
+              <Route path="students/:id" element={<StudentProfileScreen />} />
+
+              {/* Perfil do responsável */}
+              <Route path="profile" element={<ResponsavelProfileScreen />} />
+
+              {/* Configurações */}
+              <Route path="settings" element={<SettingsScreen />} />
+              <Route path="settings/alterar-senha" element={<ChangePasswordScreen />} />
+            </Route>
+          )}
+
         </Routes>
       </Router>
 

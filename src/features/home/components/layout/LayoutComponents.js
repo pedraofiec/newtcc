@@ -28,9 +28,15 @@ export const Header = () => {
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-lg">
                         <span className="text-xl text-[#8AD7E1] font-bold">🚐</span>
                     </div>
-                    <span className="text-xl font-extrabold tracking-tight text-white">
-                        ROTAVAN
-                    </span>
+                    {/* Título + subtítulo (Área do Motorista) */}
+                    <div className="flex flex-col">
+                        <span className="text-xl font-extrabold tracking-tight text-white">
+                            ROTAVAN
+                        </span>
+                        <span className="text-[11px] text-white/80 -mt-1">
+                            Área do Motorista
+                        </span>
+                    </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <button
@@ -99,10 +105,8 @@ export const DashboardLayout = () => {
                 {/* Sidebar fixa à esquerda (somente em telas grandes) */}
                 <SideBar />
 
-                {/* Área de conteúdo: padding-top para não ficar atrás do header,
-                    margin-left em telas grandes para não ficar atrás da sidebar */}
+                {/* Área de conteúdo */}
                 <main className="flex-1 pt-20 px-4 pb-8 lg:ml-60 md:px-8">
-                    {/* Aqui entram as páginas (home, rota, etc) */}
                     <Outlet />
                 </main>
             </div>

@@ -10,7 +10,7 @@ import RegisterService from '../service/RegisterService';
 const RegisterResponsible = ({ goToLogin }) => {
   const [nomeResponsavel, setNomeResponsavel] = React.useState('');
   const [cpfResponsavel, setCpfResponsavel] = React.useState('');
-  const [EnderecoCasa, setEnderecoCasa] = React.useState('');
+  const [enderecoCasa, setEnderecoCasa] = React.useState('');
   const [email, setEmail] = React.useState(''); 
   const [password, setPassword] = React.useState(''); 
   
@@ -25,7 +25,7 @@ const RegisterResponsible = ({ goToLogin }) => {
     const data = { 
       nomeResponsavel, 
       cpfResponsavel, 
-      EnderecoCasa, 
+      enderecoCasa, 
       email, 
       password 
     };
@@ -78,7 +78,7 @@ const RegisterResponsible = ({ goToLogin }) => {
           <input
             type="text"
             placeholder="Endereço Completo"
-            value={EnderecoCasa}
+            value={enderecoCasa}
             onChange={(e) => setEnderecoCasa(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
