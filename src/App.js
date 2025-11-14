@@ -41,8 +41,10 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import StatusModal from './features/shared/components/StatusModal.js';
 import { Toaster } from 'react-hot-toast';
 import { requestFcmToken, listenForegroundMessages } from './firebase';
+import useUserStore from './features/shared/store/user-store.js';
 
 function App() {
+  const {tipo, info} = useUserStore()
   useEffect(() => {
     (async () => {
       await requestFcmToken();
@@ -63,15 +65,17 @@ function App() {
           <Route path="/register/driver" element={<RegisterDriver />} />
           <Route path="/register/school" element={<RegisterSchool />} />
           <Route path="/register/student" element={<RegisterStudent />} />
+          
 
-          {/* 🔒 Rotas protegidas para MOTORISTA */}
-          <Route element={<DriverRouteGuard />}>
-            {/* Layout comum (header + sidebar) */}
-            <Route element={<DashboardLayout />}>
+
+
+            {tipo && tipo=="ROLE_MOTORISTA" &&  <Route path="/" element = {<DashboardLayout />}>
+              
               {/* Página inicial do motorista (cards de passageiros) */}
               <Route path="/home" element={<DriverScreen />} />
 
               {/* Perfil do passageiro (acesso pelo botão "Visualizar perfil") */}
+               
               <Route
                 path="/driver/passengers/:id"
                 element={<PassengerProfileScreen />}
@@ -88,6 +92,15 @@ function App() {
                 path="/driver/manage-route"
                 element={<RouteManagementScreen />}
               />
+            
+              <Route path="/settings" element={<SettingsScreen />} />
+              </Route>}
+
+          {/* 🔒 Rotas protegidas para MOTORISTA */}
+          <Route element={<DriverRouteGuard />}>
+            {/* Layout comum (header + sidebar) */}
+            <Route element={<DashboardLayout />}>
+           
               <Route path="/rotas" element={<RotasPage />} />
 
               {/* Configurações / Perfil */}

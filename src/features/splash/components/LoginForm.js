@@ -25,24 +25,29 @@ const LoginForm = ({ goToRegister }) => {
   const redirectTo =
     new URLSearchParams(location.search).get('redirect') || '/home';
 
+    const refresh = async() => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+            // Se já tem token, decodifica e atualiza o estado global
+            // Isso garante que o estado persista ao recarregar a página
+            try {
+              const me = await LoginService.me();
+              const userData = jwtDecode(token);
+              setMe(me.role, me);
+              setAuthData(userData); // Atualiza o auth store
+              navigate(redirectTo, { replace: true });
+            } catch (e) {
+              // Token inválido, limpa o token armazenado
+              localStorage.removeItem('accessToken');
+            }
+    }
+  }
+
   // Efeito que verifica se o usuário JÁ ESTÁ LOGADO
   // e redireciona para a /home se um token for encontrado.
   React.useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      // Se já tem token, decodifica e atualiza o estado global
-      // Isso garante que o estado persista ao recarregar a página
-      try {
-        const userData = jwtDecode(token);
-        setMe(userData);
-        setAuthData({ accessToken: token }); // Atualiza o auth store
-        navigate(redirectTo, { replace: true });
-      } catch (e) {
-        // Token inválido, limpa o token armazenado
-        localStorage.removeItem('accessToken');
-      }
-    }
-  }, [navigate, redirectTo, setMe, setAuthData]);
+    refresh().then().catch()
+  }, []);
 
   
   // --- ATUALIZAÇÃO: handleSubmit restaurado para usar o backend real ---
@@ -62,8 +67,10 @@ const LoginForm = ({ goToRegister }) => {
       const userData = jwtDecode(response.token);
 
       // 4. Atualiza os stores globais do Zustand
-      setAuthData(response); // Salva os dados de autenticação (ex: tokens)
-      setMe(userData);       // Salva os dados do perfil do usuário
+      setAuthData(userData); // Salva os dados de autenticação (ex: tokens)
+
+      const me = await LoginService.me();
+      setMe(me.role, me);       // Salva os dados do perfil do usuário
 
       // 5. Navega para a página de destino (ex: /home)
       navigate(redirectTo, { replace: true });
