@@ -43,6 +43,10 @@ import RotasPage from './features/rotas/pages/RotasPage';
 // Layout (Header + Sidebar)
 import { DashboardLayout } from './features/home/components/layout/LayoutComponents.js';
 
+//Tela Escola
+import EscolasScreen from './features/cadastro/Escolas/components/EscolasScreen.js';
+import EscolaLayout from './features/cadastro/Escolas/components/layout/EscolaLayout.js';
+
 // Router
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -127,6 +131,14 @@ function App() {
               <Route path="settings/alterar-senha" element={<ChangePasswordScreen />} />
             </Route>
           )}
+
+           {tipo === "ROLE_ESCOLA" && (
+            <Route path="/" element={<EscolaLayout />}>
+            <Route path="home" element= {<EscolasScreen />}/>
+
+            </Route>
+
+           )}
 
         </Routes>
       </Router>
