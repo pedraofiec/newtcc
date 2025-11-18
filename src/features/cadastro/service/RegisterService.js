@@ -50,13 +50,13 @@ const RegisterService = {
   
   /**
    * Realiza o cadastro de uma nova Escola.
-   * Rota de API assumida: /v1/api/register/school
+   * Rota de API assumida: /v1/api/register/escolas
    * @param {object} data - Dados da escola (nomeEscola, cnpj, endereço, email, senha).
    * @returns {Promise<object>} - Uma Promise que resolve para os dados da escola recém-criada.
    */
   async registerSchool(data) {
     try {
-      const response = await api.post('/v1/api/register/school', data);
+      const response = await api.post('/v1/api/auth/register/escola', data);
       
       return response.data;
     } catch (error) {

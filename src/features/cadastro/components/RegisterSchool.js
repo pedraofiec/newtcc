@@ -7,11 +7,11 @@ import './Register.css';
 import RegisterService from '../service/RegisterService'; 
 
 const RegisterSchool = ({ goToLogin }) => {
-  const [schoolName, setSchoolName] = React.useState('');
+  const [nome, setNome] = React.useState('');
   const [cnpj, setCnpj] = React.useState('');
-  const [address, setAddress] = React.useState('');
+  const [endereco, setEndereco] = React.useState('');
   const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [senha, setSenha] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
@@ -21,11 +21,11 @@ const RegisterSchool = ({ goToLogin }) => {
     setLoading(true);
 
     const data = { 
-        schoolName, 
+        nome, 
         cnpj, 
-        address, 
+        endereco, 
         email, 
-        password 
+        senha 
     };
 
     try {
@@ -60,8 +60,8 @@ const RegisterSchool = ({ goToLogin }) => {
           <input 
             type="text" 
             placeholder="Nome da Escola" 
-            value={schoolName} 
-            onChange={(e) => setSchoolName(e.target.value)} 
+            value={nome} 
+            onChange={(e) => setNome(e.target.value)} 
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required 
           />
@@ -76,8 +76,8 @@ const RegisterSchool = ({ goToLogin }) => {
           <input 
             type="text" 
             placeholder="Endereço" 
-            value={address} 
-            onChange={(e) => setAddress(e.target.value)} 
+            value={endereco} 
+            onChange={(e) => setEndereco(e.target.value)} 
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required 
           />
@@ -92,8 +92,8 @@ const RegisterSchool = ({ goToLogin }) => {
           <input 
             type="password" 
             placeholder="Senha" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
+            value={senha} 
+            onChange={(e) => setSenha(e.target.value)} 
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required 
           />

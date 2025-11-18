@@ -1,14 +1,36 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { FaUserCircle, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { getDependentes } from "../services/ResponsavelService";
 
 export default function DependentesScreen() {
   const navigate = useNavigate();
 
-  const mockDependentes = [
-    { id: 1, nome: "João Silva", idade: 10, nivel: "5º ano", escola: "EMEB Profª Francisca Lucinda Bueno" },
-    { id: 2, nome: "Maria Clara", idade: 7, nivel: "2º ano", escola: "EMEB Milton Santos" }
-  ];
+   const [dependentes, setDependentes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function carregarDependentes() {
+      try {
+        const data = await getDependentes(); // chamada ao service
+        setDependentes(data);
+      } catch (error) {
+        console.error("Erro ao carregar dependentes:", error);
+
+        // fallback temporário (mock)
+        setDependentes([
+          { id: 1, nome: "João Silva", idade: 10, nivel: "5º ano", escola: "EMEB Profª Francisca Lucinda Bueno" },
+          { id: 2, nome: "Maria Clara", idade: 7, nivel: "2º ano", escola: "EMEB Milton Santos" }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarDependentes();
+  }, []);
+
+
 
   return (
     <div className="w-full min-h-full px-6 py-6 flex flex-col">
@@ -32,7 +54,7 @@ export default function DependentesScreen() {
 
       {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        {mockDependentes.map((dep) => (
+        {dependentes.map((dep) => (
           <div
             key={dep.id}
             className="bg-white rounded-3xl shadow-xl p-6 border border-slate-200 flex flex-col items-center"
