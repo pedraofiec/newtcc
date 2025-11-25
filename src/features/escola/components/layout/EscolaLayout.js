@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useNavigate, NavLink, Outlet } from "react-router-dom";
-import { FaUserCircle, FaSignOutAlt, FaUserGraduate } from "react-icons/fa";
+import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import { MdOutlineDashboard, MdSchool } from "react-icons/md";
 
 /* ============== Header da Escola ============== */
@@ -27,6 +27,7 @@ export const EscolaHeader = () => {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Botão Perfil do header → /escola/profile */}
           <button
             onClick={() => navigate("/escola/profile")}
             className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition duration-150"
@@ -63,18 +64,13 @@ export const EscolaSideBar = () => {
       className="fixed inset-y-0 left-0 z-20 hidden w-60 transform overflow-y-auto border-r border-slate-100 bg-white p-4 shadow-xl transition duration-300 ease-in-out lg:flex lg:flex-col lg:pt-20"
     >
       <div className="flex flex-col gap-2">
-        {/* Página inicial da escola (dashboard) */}
-        <NavLink to="/escola/home" className={linkClasses}>
+        {/* Página inicial da escola (lista de estudantes) */}
+        <NavLink to="/home" className={linkClasses}>
           <MdOutlineDashboard className="w-5 h-5" /> Página inicial
         </NavLink>
 
-        {/* Tela de estudantes da escola (como o Figma de ESTUDANTES) */}
-        <NavLink to="/escola/estudantes" className={linkClasses}>
-          <FaUserGraduate className="w-5 h-5" /> Estudantes
-        </NavLink>
-
         {/* Perfil da escola */}
-        <NavLink to="/escola/profile" className={linkClasses}>
+        <NavLink to="/profile" className={linkClasses}>
           <MdSchool className="w-5 h-5" /> Perfil
         </NavLink>
       </div>
@@ -93,7 +89,7 @@ const EscolaLayout = () => {
         {/* Sidebar fixa à esquerda */}
         <EscolaSideBar />
 
-        {/* Área de conteúdo (onde entra a tela de ESTUDANTES da escola) */}
+        {/* Área de conteúdo */}
         <main className="flex-1 pt-20 px-4 pb-8 lg:ml-60 md:px-8">
           <Outlet />
         </main>

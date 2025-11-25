@@ -30,11 +30,15 @@ import StudentProfileScreen from './features/responsavel/components/StudentProfi
 import ResponsavelProfileScreen from './features/responsavel/components/ResponsavelProfileScreen.js';
 import ResponsavelLayout from './features/responsavel/components/layout/ResponsavelLayout';
 
+//Tela Escola
+import EscolaLayout from './features/escola/components/layout/EscolaLayout.js';
+import EscolaProfileScreen from './features/escola/components/EscolaProfileScreen.js';
+import EscolaHomeScreen from './features/escola/components/EscolaHomeScreen.js';
+import EscolaStudentProfileScreen from './features/escola/components/EscolaStudentProfileScreen.js';
 
 // Telas de configurações
 import SettingsScreen from './features/home/components/SettingsScreen.js';
 import ChangePasswordScreen from './features/home/components/settings/ChangePasswordScreen.js';
-import TermsOfUseScreen from './features/home/components/settings/TermsOfUseScreen.js';
 import EditProfileScreen from './features/home/components/settings/EditProfileScreen.js';
 
 // Rotas gerais
@@ -42,10 +46,6 @@ import RotasPage from './features/rotas/pages/RotasPage';
 
 // Layout (Header + Sidebar)
 import { DashboardLayout } from './features/home/components/layout/LayoutComponents.js';
-
-//Tela Escola
-import EscolasScreen from './features/cadastro/Escolas/components/EscolasScreen.js';
-import EscolaLayout from './features/cadastro/Escolas/components/layout/EscolaLayout.js';
 
 // Router
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
@@ -132,13 +132,19 @@ function App() {
             </Route>
           )}
 
-           {tipo === "ROLE_ESCOLA" && (
+          {tipo === "ROLE_ESCOLA" && (
             <Route path="/" element={<EscolaLayout />}>
-            <Route path="home" element= {<EscolasScreen />}/>
+              {/* Página inicial da escola → estudantes */}
+              <Route index element={<EscolaHomeScreen />} />
+              <Route path="home" element={<EscolaHomeScreen />} />
 
+              {/* Perfil da escola (a tela de edição que fizemos) */}
+              <Route path="profile" element={<EscolaProfileScreen />} />
+
+              {/* ✅ NOVA ROTA: perfil de aluno */}
+              <Route path="students/:id" element={<EscolaStudentProfileScreen />} />
             </Route>
-
-           )}
+          )}
 
         </Routes>
       </Router>
