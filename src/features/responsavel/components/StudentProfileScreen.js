@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaUserCircle, FaEdit, FaSave } from "react-icons/fa";
+import { getDependenteById } from "../services/ResponsavelService";
 
 export default function StudentProfileScreen() {
   const navigate = useNavigate();
@@ -8,14 +9,15 @@ export default function StudentProfileScreen() {
 
   // Dados atuais do dependente (mock – depois vem da API)
   const [aluno, setAluno] = useState({
-    id,
-    nome: "Nome do Estudante",
-    idade: "10 anos",
-    nivel: "5º ano",
-    escola: "EMEB Profª Francisca Lucinda Bueno",
-    endereco: "Rua das Flores, 123 - Jardim Primavera, Indaiatuba",
-    observacoes: "Nenhuma observação registrada.",
+    
   });
+  useEffect(() => {
+      getDependenteById(id).then((data) => {
+          setAluno(data);
+      }).catch((error) => {
+          console.error("Erro ao carregar dependente:", error);
+      });
+  },[])
 
   // Estado de edição
   const [isEditing, setIsEditing] = useState(false);
@@ -105,7 +107,7 @@ export default function StudentProfileScreen() {
           <div className="space-y-6 text-sm text-slate-700">
             <Info label="Idade" value={aluno.idade} />
             <Info label="Nível escolar" value={aluno.nivel} />
-            <Info label="Escola" value={aluno.escola} />
+            <Info label="Escola" value={aluno.escola && aluno.escola.nome} />
             <Info label="Endereço" value={aluno.endereco} />
             <Info label="Observações" value={aluno.observacoes} />
 
@@ -125,7 +127,7 @@ export default function StudentProfileScreen() {
             <Edit label="Nome completo" value={nome} setValue={setNome} />
             <Edit label="Idade" value={idade} setValue={setIdade} />
             <Edit label="Nível escolar" value={nivel} setValue={setNivel} />
-            <Edit label="Escola" value={escola} setValue={setEscola} />
+            <Edit label="Escola" value={escola && escola.nome} setValue={setEscola} />
             <Edit label="Endereço" value={endereco} setValue={setEndereco} />
             <Edit label="Observações" value={observacoes} setValue={setObservacoes} />
 

@@ -9,6 +9,26 @@ export default function DependentesScreen() {
    const [dependentes, setDependentes] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const calculateAge = (birthdate) => {
+    console.log(birthdate)
+    if (!birthdate) {
+      return 0;
+    }
+
+    const today = new Date();
+    const birthdateDate = new Date(birthdate); // Converte a string de data (YYYY-MM-DD) para objeto Date.
+
+    let calculatedAge = today.getFullYear() - birthdateDate.getFullYear();
+    const monthDiff = today.getMonth() - birthdateDate.getMonth();
+
+    // Ajusta a idade se o aniversário ainda não ocorreu este ano
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdateDate.getDate())) {
+      calculatedAge--;
+    }
+
+    return calculatedAge
+  };
+
   useEffect(() => {
     async function carregarDependentes() {
       try {
@@ -69,9 +89,9 @@ export default function DependentesScreen() {
 
             <div className="w-full mt-4 space-y-2 text-sm text-slate-600">
 
-              <Field label="Idade" value={dep.idade + " anos"} />
-              <Field label="Nível escolar" value={dep.nivel} />
-              <Field label="Escola" value={dep.escola} />
+              <Field label="Idade" value={calculateAge(dep.dataNascimento) + " anos"} />
+              <Field label="Nível escolar" value={dep.nivelEscolar} />
+              <Field label="Escola" value={dep.escola.nome} />
 
             </div>
 

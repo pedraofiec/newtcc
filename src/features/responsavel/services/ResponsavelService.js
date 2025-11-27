@@ -28,7 +28,7 @@ export async function updateResponsavel(data) {
 // 🔹 Listar dependentes vinculados ao responsável
 export async function getDependentes() {
   try {
-    const response = await api.get("/responsaveis/dependentes");
+    const response = await api.get("/responsaveis/dependentes/criancas");
     return response.data;
   } catch (error) {
     console.error("Erro ao carregar dependentes:", error);
@@ -39,7 +39,7 @@ export async function getDependentes() {
 // 🔹 Buscar dependente por ID
 export async function getDependenteById(id) {
   try {
-    const response = await api.get(`/responsaveis/dependentes/${id}`);
+    const response = await api.get(`/responsaveis/dependentes/criancas/${id}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao carregar dependente:", error);
@@ -50,10 +50,10 @@ export async function getDependenteById(id) {
 // 🔹 Cadastrar novo dependente
 export async function createDependente(data) {
   try {
-    const response = await api.post("/responsaveis/dependentes", data);
+    const response = await api.post(`/responsaveis/dependentes/criancas`, data);
     return response.data;
   } catch (error) {
-    console.error("Erro ao cadastrar dependente:", error);
+    //console.error("Erro ao cadastrar dependente:", error.response?.data || error);
     throw error;
   }
 }
