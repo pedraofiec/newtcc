@@ -10,7 +10,6 @@ import ForgotPassword from './features/splash/components/ForgotPassword';
 // Guarda de rota para motorista
 import DriverRouteGuard from './features/motorista/components/DriverRouteGuard.js';
 
-
 // Componentes de cadastro
 import RegisterResponsible from './features/cadastro/components/RegisterResponsible';
 import RegisterDriver from './features/cadastro/components/RegisterDriver';
@@ -23,14 +22,15 @@ import StudentAssignmentScreen from './features/motorista/components/StudentAssi
 import DriverScreen from './features/motorista/components/DriverScreen';
 import PassengerProfileScreen from './features/motorista/components/PassengerProfileScreen.js';
 
-// Telas de responsável (NOVAS)
+// Telas de responsável
 import DependentesScreen from './features/responsavel/components/DependentesScreen';
 import EncontrarMotoristasScreen from './features/responsavel/components/EncontrarMotoristasScreen';
 import StudentProfileScreen from './features/responsavel/components/StudentProfileScreen.js';
 import ResponsavelProfileScreen from './features/responsavel/components/ResponsavelProfileScreen.js';
 import ResponsavelLayout from './features/responsavel/components/layout/ResponsavelLayout';
+import MotoristaProfileScreen from './features/responsavel/components/MotoristaProfileScreen.js';
 
-//Tela Escola
+// Tela Escola
 import EscolaLayout from './features/escola/components/layout/EscolaLayout.js';
 import EscolaProfileScreen from './features/escola/components/EscolaProfileScreen.js';
 import EscolaHomeScreen from './features/escola/components/EscolaHomeScreen.js';
@@ -44,7 +44,7 @@ import EditProfileScreen from './features/home/components/settings/EditProfileSc
 // Rotas gerais
 import RotasPage from './features/rotas/pages/RotasPage';
 
-// Layout (Header + Sidebar)
+// Layout (Header + Sidebar motorista)
 import { DashboardLayout } from './features/home/components/layout/LayoutComponents.js';
 
 // Router
@@ -83,10 +83,8 @@ function App() {
           {/* ====================================================================================== */}
           {/* 🔒 ROTAS EXCLUSIVAS DO MOTORISTA */}
           {/* ====================================================================================== */}
-
-          {tipo === "ROLE_MOTORISTA" && (
+          {tipo === 'ROLE_MOTORISTA' && (
             <Route path="/" element={<DashboardLayout />}>
-
               {/* Home do motorista */}
               <Route path="/home" element={<DriverScreen />} />
 
@@ -107,18 +105,21 @@ function App() {
             </Route>
           )}
 
+          {/* ====================================================================================== */}
           {/* 🔒 ROTAS EXCLUSIVAS DO RESPONSÁVEL */}
-          {tipo === "ROLE_RESPONSAVEL" && (
+          {/* ====================================================================================== */}
+          {tipo === 'ROLE_RESPONSAVEL' && (
             <Route path="/" element={<ResponsavelLayout />}>
-
               {/* Home do responsável */}
               <Route index element={<DependentesScreen />} />
               <Route path="home" element={<DependentesScreen />} />
 
               {/* Solicitações = EncontrarMotoristas */}
               <Route path="solicitacoes" element={<EncontrarMotoristasScreen />} />
-              {/* (se em algum lugar você ainda usar /encontrar-motoristas, também deixo funcionando) */}
               <Route path="encontrar-motoristas" element={<EncontrarMotoristasScreen />} />
+
+              {/* ✅ Perfil do motorista (novo) */}
+              <Route path="motoristas/:id" element={<MotoristaProfileScreen />} />
 
               {/* Perfil do dependente */}
               <Route path="students/:id" element={<StudentProfileScreen />} />
@@ -126,26 +127,28 @@ function App() {
               {/* Perfil do responsável */}
               <Route path="profile" element={<ResponsavelProfileScreen />} />
 
-              {/* Configurações */}
+              {/* Configurações (se quiser pode até remover se não usar aqui) */}
               <Route path="settings" element={<SettingsScreen />} />
               <Route path="settings/alterar-senha" element={<ChangePasswordScreen />} />
             </Route>
           )}
 
-          {tipo === "ROLE_ESCOLA" && (
+          {/* ====================================================================================== */}
+          {/* 🔒 ROTAS EXCLUSIVAS DA ESCOLA */}
+          {/* ====================================================================================== */}
+          {tipo === 'ROLE_ESCOLA' && (
             <Route path="/" element={<EscolaLayout />}>
               {/* Página inicial da escola → estudantes */}
               <Route index element={<EscolaHomeScreen />} />
               <Route path="home" element={<EscolaHomeScreen />} />
 
-              {/* Perfil da escola (a tela de edição que fizemos) */}
+              {/* Perfil da escola */}
               <Route path="profile" element={<EscolaProfileScreen />} />
 
-              {/* ✅ NOVA ROTA: perfil de aluno */}
+              {/* Perfil de aluno da escola */}
               <Route path="students/:id" element={<EscolaStudentProfileScreen />} />
             </Route>
           )}
-
         </Routes>
       </Router>
 

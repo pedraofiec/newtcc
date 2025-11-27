@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { FaUserCircle, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getDependentes } from "../services/ResponsavelService";
@@ -6,7 +6,7 @@ import { getDependentes } from "../services/ResponsavelService";
 export default function DependentesScreen() {
   const navigate = useNavigate();
 
-   const [dependentes, setDependentes] = useState([]);
+  const [dependentes, setDependentes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,8 +19,20 @@ export default function DependentesScreen() {
 
         // fallback temporário (mock)
         setDependentes([
-          { id: 1, nome: "João Silva", idade: 10, nivel: "5º ano", escola: "EMEB Profª Francisca Lucinda Bueno" },
-          { id: 2, nome: "Maria Clara", idade: 7, nivel: "2º ano", escola: "EMEB Milton Santos" }
+          {
+            id: 1,
+            nome: "João Silva",
+            idade: 10,
+            nivel: "5º ano",
+            escola: "EMEB Profª Francisca Lucinda Bueno",
+          },
+          {
+            id: 2,
+            nome: "Maria Clara",
+            idade: 7,
+            nivel: "2º ano",
+            escola: "EMEB Milton Santos",
+          },
         ]);
       } finally {
         setLoading(false);
@@ -30,11 +42,16 @@ export default function DependentesScreen() {
     carregarDependentes();
   }, []);
 
-
+  if (loading) {
+    return (
+      <div className="w-full min-h-full px-6 py-6 flex items-center justify-center">
+        <p className="text-slate-500">Carregando dependentes...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-full px-6 py-6 flex flex-col">
-
       {/* Título */}
       <div className="flex justify-center mb-10">
         <div className="bg-[#73C8D5] px-10 py-3 rounded-full text-white shadow-md text-lg font-semibold tracking-wide">
@@ -52,32 +69,34 @@ export default function DependentesScreen() {
         </button>
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      {/* Cards – AQUI estão os ajustes de tamanho/largura/altura */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 max-w-5xl mx-auto">
         {dependentes.map((dep) => (
           <div
             key={dep.id}
-            className="bg-white rounded-3xl shadow-xl p-6 border border-slate-200 flex flex-col items-center"
+            className="bg-white rounded-[32px] shadow-2xl p-10 border border-slate-200 flex flex-col items-center w-[330px] h-[500px] mx-auto"
           >
             {/* Avatar */}
-            <div className="w-24 h-24 rounded-full bg-[#73C8D5] flex items-center justify-center shadow mb-4">
-              <FaUserCircle className="text-white text-5xl" />
+            <div className="w-32 h-32 rounded-full bg-[#73C8D5] flex items-center justify-center shadow mb-6">
+              <FaUserCircle className="text-white text-6xl" />
             </div>
 
             {/* Nome */}
-            <h3 className="text-xl font-semibold text-slate-700">{dep.nome}</h3>
+            <h3 className="text-2xl font-semibold text-slate-700 mb-4">
+              {dep.nome}
+            </h3>
 
-            <div className="w-full mt-4 space-y-2 text-sm text-slate-600">
-
-              <Field label="Idade" value={dep.idade + " anos"} />
+            {/* Infos */}
+            <div className="w-full space-y-3 text-base text-slate-700">
+              <Field label="Idade" value={`${dep.idade} anos`} />
               <Field label="Nível escolar" value={dep.nivel} />
               <Field label="Escola" value={dep.escola} />
-
             </div>
 
+            {/* Botão */}
             <button
               onClick={() => navigate(`/students/${dep.id}`)}
-              className="mt-6 w-full bg-[#73C8D5] text-white py-2 rounded-full shadow hover:bg-[#6abcca]"
+              className="mt-auto w-full bg-[#73C8D5] text-white py-3 rounded-full shadow hover:bg-[#6abcca] text-base font-semibold"
             >
               Editar perfil
             </button>
