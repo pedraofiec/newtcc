@@ -37,11 +37,7 @@ export default function DependentesScreen() {
       } catch (error) {
         console.error("Erro ao carregar dependentes:", error);
 
-        // fallback temporário (mock)
-        setDependentes([
-          { id: 1, nome: "João Silva", idade: 10, nivel: "5º ano", escola: "EMEB Profª Francisca Lucinda Bueno" },
-          { id: 2, nome: "Maria Clara", idade: 7, nivel: "2º ano", escola: "EMEB Milton Santos" }
-        ]);
+      
       } finally {
         setLoading(false);
       }

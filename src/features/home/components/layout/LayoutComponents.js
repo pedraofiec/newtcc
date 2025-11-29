@@ -64,6 +64,7 @@ export const Header = () => {
 
 
 /* ============== SideBar ============== */
+/* ============== SideBar ============== */
 export const SideBar = () => {
     const linkClasses = ({ isActive }) =>
         `flex items-center gap-3 p-3 rounded-lg transition duration-150 ${
@@ -80,19 +81,28 @@ export const SideBar = () => {
                 <NavLink to="/home" className={linkClasses}>
                     <MdOutlineDashboard className="w-5 h-5" /> Página inicial
                 </NavLink>
+
                 <NavLink to="/driver/manage-students" className={linkClasses}>
                     <FaUser className="w-5 h-5" /> Solicitações
                 </NavLink>
+
+                <NavLink to="/rotas" className={linkClasses}>
+                    <FaMapMarkedAlt className="w-5 h-5" /> Rotas
+                </NavLink>
+
+                {/* 🚐 Botão novo: Veículos */}
+                <NavLink to="/driver/veiculos" className={linkClasses}>
+                    <FaCar className="w-5 h-5" /> Veículos
+                </NavLink>
+
                 <NavLink to="/settings/perfil" className={linkClasses}>
                     <FaUserCircle className="w-5 h-5" /> Perfil
-                </NavLink>
-                <NavLink to="/rotas" className={linkClasses}>
-                    <FaMapMarkedAlt className="w-5 h-5" /> Rota
                 </NavLink>
             </div>
         </nav>
     );
 };
+
 
 /* ============== Layout completo (Header + SideBar + Conteúdo) ============== */
 export const DashboardLayout = () => {
