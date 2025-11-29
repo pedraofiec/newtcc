@@ -1,6 +1,6 @@
 // src/features/motorista/components/StudentAssignmentScreen.js
 import React, { useState, useEffect } from "react";
-import { listarRotasDaSolicitacao } from "../services/SolicitacoesService";
+import { listarRotasDaSolicitacao } from "../Services/SolicitacoesService";
 import { listarRotas } from "../../rotas/services/RotaService";// <-- NOVO
 
 // Botão padrão (mesmo estilo que usamos em outras telas)

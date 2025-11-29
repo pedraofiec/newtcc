@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import { FaChevronLeft, FaRoute, FaEdit, FaTrash } from "react-icons/fa";
 
-
-import { listarRotas, obterRotaPorId} from "../../rotas/services/RotaService";
-import { getPontoById, updatePonto, deletePonto } from "../services/PontoControllerService";
+import { getPontoById, updatePonto, deletePonto } from "../Services/PontoControllerService";
+import { listarRotas, obterRotaPorId } from "../../rotas/services/RotaService";
 
 
 const RouteManagementScreen = () => {
