@@ -1,34 +1,84 @@
 // src/features/escola/components/EscolaProfileScreen.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaSchool, FaSave, FaEdit } from "react-icons/fa";
+
+// 🔗 Service de escolas
+import {
+  listarEscolas,
+  atualizarEscola,
+} from "../service/EscolaService";
+
 
 const EscolaProfileScreen = () => {
   const navigate = useNavigate();
 
-  // Dados atuais da escola (mock por enquanto – depois você troca por dados da API)
-  const [escola, setEscola] = useState({
-    nome: "EMEB Profª Francisca Lucinda Bueno",
-    email: "emic.francisca@indaiatuba.sp.gov.br",
-    telefone: "(19) 99999-1234",
-    endereco: "Rua das Acácias, 250 – Jardim Europa, Indaiatuba/SP",
-    diretor: "Maria de Souza",
-  });
+  // Estado com dados da escola
+  const [escola, setEscola] = useState(null); // começa sem dados
+  const [escolaId, setEscolaId] = useState(null);
 
   // Estado de modo (visualização x edição)
   const [isEditing, setIsEditing] = useState(false);
 
   // Estado do formulário (edição)
-  const [nome, setNome] = useState(escola.nome);
-  const [email, setEmail] = useState(escola.email);
-  const [telefone, setTelefone] = useState(escola.telefone);
-  const [endereco, setEndereco] = useState(escola.endereco);
-  const [diretor, setDiretor] = useState(escola.diretor);
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [endereco, setEndereco] = useState("");
+  const [diretor, setDiretor] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [loadingInicial, setLoadingInicial] = useState(true);
   const [erro, setErro] = useState(null);
   const [sucesso, setSucesso] = useState(false);
+
+  // 🔹 Carrega dados da escola na montagem
+  useEffect(() => {
+    async function carregarEscola() {
+      try {
+        setLoadingInicial(true);
+        setErro(null);
+
+        // 👉 Aqui estou usando listarEscolas() e pegando a primeira
+        // escola como exemplo. Em produção, o ideal é buscar a
+        // escola associada ao usuário logado (ex.: via /users/me).
+        const data = await listarEscolas();
+
+        if (!data || data.length === 0) {
+          setErro("Nenhuma escola encontrada na API.");
+          return;
+        }
+
+        const primeira = data[0];
+
+        const escolaFormatada = {
+          nome: primeira.nome || "",
+          email: primeira.email || "",
+          telefone: primeira.telefone || "",
+          endereco: primeira.endereco || "",
+          diretor: primeira.diretor || "",
+        };
+
+        setEscola(escolaFormatada);
+        setEscolaId(primeira.id);
+
+        // Preenche o formulário com os dados carregados
+        setNome(escolaFormatada.nome);
+        setEmail(escolaFormatada.email);
+        setTelefone(escolaFormatada.telefone);
+        setEndereco(escolaFormatada.endereco);
+        setDiretor(escolaFormatada.diretor);
+      } catch (err) {
+        console.error("Erro ao carregar dados da escola:", err);
+        setErro("Erro ao carregar dados da escola. Tente novamente.");
+      } finally {
+        setLoadingInicial(false);
+      }
+    }
+
+    carregarEscola();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,22 +87,32 @@ const EscolaProfileScreen = () => {
     setSucesso(false);
 
     try {
-      // 🔸 Aqui entra a chamada real de API (ex: escolaService.updateEscola({...}))
-      // const data = await updateEscola({ nome, email, telefone, endereco, diretor });
-      // setEscola(data);
+      if (!escolaId) {
+        throw new Error("ID da escola não disponível.");
+      }
 
-      // Mock de delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // Atualiza o “estado oficial” da escola
-      setEscola({
+      // Payload para o backend (ajuste os nomes conforme o seu DTO)
+      const payload = {
         nome,
         email,
         telefone,
         endereco,
         diretor,
-      });
+      };
 
+      // 🔸 Chamada real de API
+      const escolaAtualizada = await atualizarEscola(escolaId, payload);
+
+      // Ajuste se o backend devolver outros nomes de campos
+      const escolaFormatada = {
+        nome: escolaAtualizada.nome || nome,
+        email: escolaAtualizada.email || email,
+        telefone: escolaAtualizada.telefone || telefone,
+        endereco: escolaAtualizada.endereco || endereco,
+        diretor: escolaAtualizada.diretor || diretor,
+      };
+
+      setEscola(escolaFormatada);
       setSucesso(true);
       setIsEditing(false);
     } catch (err) {
@@ -64,15 +124,41 @@ const EscolaProfileScreen = () => {
   };
 
   const handleCancelarEdicao = () => {
-    // Volta os campos do formulário para o que estava salvo
-    setNome(escola.nome);
-    setEmail(escola.email);
-    setTelefone(escola.telefone);
-    setEndereco(escola.endereco);
-    setDiretor(escola.diretor);
+    if (escola) {
+      // Volta os campos do formulário para o que estava salvo
+      setNome(escola.nome);
+      setEmail(escola.email);
+      setTelefone(escola.telefone);
+      setEndereco(escola.endereco);
+      setDiretor(escola.diretor);
+    }
     setErro(null);
     setIsEditing(false);
   };
+
+  // 🔄 Loading inicial
+  if (loadingInicial) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center min-h-[60vh]">
+        <p className="text-slate-600 text-sm">Carregando dados da escola...</p>
+      </div>
+    );
+  }
+
+  // ❌ Não conseguiu carregar
+  if (!escola && erro) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center min-h-[60vh]">
+        <p className="text-slate-700 mb-4">{erro}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-[#8AD7E1] text-white px-4 py-2 rounded-full text-sm font-semibold shadow"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full flex flex-col items-center font-sans">
@@ -112,7 +198,7 @@ const EscolaProfileScreen = () => {
           )}
 
           {/* ===================== MODO VISUALIZAÇÃO ===================== */}
-          {!isEditing && (
+          {!isEditing && escola && (
             <div className="flex flex-col gap-6">
               {/* Avatar + nome */}
               <div className="flex flex-col items-center gap-3">
@@ -123,7 +209,9 @@ const EscolaProfileScreen = () => {
                   <p className="text-lg font-semibold text-gray-800">
                     {escola.nome}
                   </p>
-                  <p className="text-sm text-gray-500">{escola.diretor}</p>
+                  <p className="text-sm text-gray-500">
+                    {escola.diretor || "Diretor(a) não informado(a)"}
+                  </p>
                 </div>
               </div>
 

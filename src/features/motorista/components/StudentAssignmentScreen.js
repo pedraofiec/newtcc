@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+// src/features/motorista/components/StudentAssignmentScreen.js
+import React, { useState, useEffect } from "react";
+import { listarRotasDaSolicitacao } from "../services/SolicitacoesService";
+import { listarRotas } from "../../rotas/services/RotaService";// <-- NOVO
 
 // Botão padrão (mesmo estilo que usamos em outras telas)
 const RotaVanButton = ({ children, color = "blue", onClick }) => {
@@ -19,90 +22,137 @@ const RotaVanButton = ({ children, color = "blue", onClick }) => {
   );
 };
 
-// Dados mockados (depois você pode puxar do back)
-const INITIAL_CURRENT = [
-  {
-    id: 1,
-    name: "João da Silva",
-    school: "Escola A",
-    address: "Rua A, 123",
-    route: {
-      ida: { time: "26min", distance: "11km" },
-      volta: { time: "28min", distance: "11,7km" },
-    },
-  },
-  {
-    id: 2,
-    name: "Maria Souza",
-    school: "Escola B",
-    address: "Av. B, 456",
-    route: {
-      ida: { time: "24min", distance: "9,8km" },
-      volta: { time: "25min", distance: "10,1km" },
-    },
-  },
-  {
-    id: 3,
-    name: "Pedro Santos",
-    school: "Escola A",
-    address: "Rua C, 789",
-    route: {
-      ida: { time: "20min", distance: "8km" },
-      volta: { time: "22min", distance: "8,5km" },
-    },
-  },
-];
+// função auxiliar para mapear o aluno que vem da API
+const mapAlunoToStudent = (aluno, rota) => {
+  return {
+    // id do “student” na tela (pode ser o próprio id do aluno ou da solicitação)
+    id:
+      aluno.id ||
+      aluno.solicitacaoId ||
+      aluno.idSolicitacao ||
+      `${rota?.id || "rota"}-${aluno?.nome || aluno?.name || "aluno"}`,
 
-const INITIAL_AVAILABLE = [
-  {
-    id: 4,
-    name: "Ana Oliveira",
-    school: "Escola C",
-    address: "Rua D, 10",
-    route: {
-      ida: { time: "30min", distance: "12km" },
-      volta: { time: "32min", distance: "12,5km" },
-    },
-  },
-  {
-    id: 5,
-    name: "Lucas Costa",
-    school: "Escola A",
-    address: "Av. E, 20",
-    route: {
-      ida: { time: "18min", distance: "7km" },
-      volta: { time: "19min", distance: "7,3km" },
-    },
-  },
-];
+    // usado para chamar /solicitacoes/{id}/rotas no modal
+    solicitacaoId: aluno.solicitacaoId || aluno.idSolicitacao || aluno.id,
+
+    name: aluno.nome || aluno.name || "Aluno sem nome informado",
+    school:
+      aluno.escola?.nome ||
+      aluno.schoolName ||
+      rota?.escola?.nome ||
+      "Escola não informada",
+    address:
+      aluno.endereco ||
+      aluno.address ||
+      aluno.enderecoAluno ||
+      "Endereço não informado",
+  };
+};
 
 const StudentAssignmentScreen = () => {
-  const [currentStudents, setCurrentStudents] = useState(INITIAL_CURRENT);
-  const [availableStudents, setAvailableStudents] = useState(INITIAL_AVAILABLE);
+  const [currentStudents, setCurrentStudents] = useState([]);
+  const [availableStudents, setAvailableStudents] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
   // Estado do modal de sugestão de rota
   const [selectedStudent, setSelectedStudent] = useState(null);
- const [activeRouteTab, setActiveRouteTab] = useState("ida");
+  const [activeRouteTab, setActiveRouteTab] = useState("ida");
 
+  // Estado da resposta de rota da API (Solicitações)
+  const [routeSuggestion, setRouteSuggestion] = useState(null);
+  const [routeLoading, setRouteLoading] = useState(false);
+  const [routeError, setRouteError] = useState(null);
 
-  const handleRemoveFromRoute = (student) => {
+  // Carregar rotas do backend (RotaService) ao montar a tela
+  useEffect(() => {
+    const carregarRotas = async () => {
+      setLoading(true);
+      setLoadError(null);
+
+      try {
+        const data = await listarRotas(); // pode vir array ou objeto
+
+        const rotas = Array.isArray(data) ? data : [data];
+
+        const alunosDaRota = [];
+
+        rotas.forEach((rota) => {
+          // AJUSTE AQUI se o nome da lista de alunos for outro
+          const alunos =
+            rota.alunos ||
+            rota.estudantes ||
+            rota.students ||
+            rota.alunosRota ||
+            [];
+
+          alunos.forEach((aluno) => {
+            alunosDaRota.push(mapAlunoToStudent(aluno, rota));
+          });
+        });
+
+        // Por enquanto, todos os alunos vindos da rota entram como "atuais".
+        // Se o seu back diferenciar “atuais” e “disponíveis”, dá pra separar aqui.
+        setCurrentStudents(alunosDaRota);
+        setAvailableStudents([]); // ajuste depois se existir outra fonte
+      } catch (error) {
+        console.error(error);
+        setLoadError("Não foi possível carregar as rotas do motorista.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarRotas();
+  }, []);
+
+  const handleRemoveFromRouteClick = (student) => {
+    // Ajuste de estado local; se quiser persistir no back, aqui é o ponto pra chamar PUT/DELETE
     setCurrentStudents((prev) => prev.filter((s) => s.id !== student.id));
     setAvailableStudents((prev) => [...prev, student]);
   };
 
-  const handleAddToRoute = (student) => {
+  const handleAddToRouteClick = (student) => {
     setAvailableStudents((prev) => prev.filter((s) => s.id !== student.id));
     setCurrentStudents((prev) => [...prev, student]);
   };
 
-  const openRouteSuggestion = (student) => {
+  const openRouteSuggestion = async (student) => {
     setSelectedStudent(student);
     setActiveRouteTab("ida");
+    setRouteSuggestion(null);
+    setRouteError(null);
+    setRouteLoading(true);
+
+    try {
+      // usa o id da solicitação (se existir) ou o próprio id
+      const solicitacaoId = student.solicitacaoId || student.id;
+
+      const data = await listarRotasDaSolicitacao(solicitacaoId);
+
+      // Exemplo esperado (ajuste conforme o retorno real da API):
+      // {
+      //   ida:   { tempoEstimado: "26min", distancia: "11km" },
+      //   volta: { tempoEstimado: "28min", distancia: "11,7km" }
+      // }
+      setRouteSuggestion(data || null);
+    } catch (error) {
+      console.error(error);
+      setRouteError("Erro ao carregar sugestão de rota.");
+    } finally {
+      setRouteLoading(false);
+    }
   };
 
   const closeRouteSuggestion = () => {
     setSelectedStudent(null);
+    setRouteSuggestion(null);
+    setRouteError(null);
   };
+
+  const ida = routeSuggestion?.ida || {};
+  const volta = routeSuggestion?.volta || {};
 
   return (
     <div className="w-full p-6">
@@ -118,6 +168,16 @@ const StudentAssignmentScreen = () => {
         <span className="text-pink-500 text-xl">🧭</span>
         Gerenciamento de Alunos na Rota
       </h1>
+
+      {loading && (
+        <div className="mb-4 text-sm text-gray-600">
+          Carregando rotas do motorista...
+        </div>
+      )}
+
+      {loadError && (
+        <div className="mb-4 text-sm text-red-600">{loadError}</div>
+      )}
 
       {/* Alunos Atuais */}
       <div className="bg-white rounded-xl shadow mb-6">
@@ -145,7 +205,6 @@ const StudentAssignmentScreen = () => {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Abre sugestão de rota (igual ao Figma) */}
                 <RotaVanButton
                   color="blue"
                   onClick={() => openRouteSuggestion(student)}
@@ -153,10 +212,9 @@ const StudentAssignmentScreen = () => {
                   Sugestão de rota
                 </RotaVanButton>
 
-                {/* Remove da rota */}
                 <RotaVanButton
                   color="red"
-                  onClick={() => handleRemoveFromRoute(student)}
+                  onClick={() => handleRemoveFromRouteClick(student)}
                 >
                   Remover
                 </RotaVanButton>
@@ -164,7 +222,7 @@ const StudentAssignmentScreen = () => {
             </div>
           ))}
 
-          {currentStudents.length === 0 && (
+          {!loading && currentStudents.length === 0 && (
             <div className="px-6 py-4 text-sm text-gray-500">
               Nenhum aluno na rota no momento.
             </div>
@@ -207,7 +265,7 @@ const StudentAssignmentScreen = () => {
 
                 <RotaVanButton
                   color="green"
-                  onClick={() => handleAddToRoute(student)}
+                  onClick={() => handleAddToRouteClick(student)}
                 >
                   Adicionar
                 </RotaVanButton>
@@ -215,7 +273,7 @@ const StudentAssignmentScreen = () => {
             </div>
           ))}
 
-          {availableStudents.length === 0 && (
+          {!loading && availableStudents.length === 0 && (
             <div className="px-6 py-4 text-sm text-gray-500">
               Nenhum aluno disponível para adicionar.
             </div>
@@ -223,7 +281,7 @@ const StudentAssignmentScreen = () => {
         </div>
       </div>
 
-      {/* MODAL de Sugestão de Rota (igual ao Figma) */}
+      {/* MODAL de Sugestão de Rota */}
       {selectedStudent && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="bg-[#8AD7E1] rounded-3xl w-full max-w-5xl mx-4 shadow-xl relative">
@@ -282,43 +340,70 @@ const StudentAssignmentScreen = () => {
             {/* Conteúdo dos mapas */}
             <div className="px-8 pb-8">
               <div className="bg-[#CFF4F7] rounded-3xl px-6 py-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Mapa Ida */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-full h-48 bg-white rounded-2xl shadow-inner mb-3 flex items-center justify-center text-gray-400 text-sm">
-                      Mapa da rota de ida
-                    </div>
-                    <div className="text-xs text-gray-700 text-center">
-                      <div>
-                        Tempo estimado:{" "}
-                        <strong>{selectedStudent.route.ida.time}</strong>
+                {routeLoading && (
+                  <div className="text-center text-sm text-gray-700">
+                    Carregando sugestão de rota...
+                  </div>
+                )}
+
+                {routeError && (
+                  <div className="text-center text-sm text-red-600">
+                    {routeError}
+                  </div>
+                )}
+
+                {!routeLoading && !routeError && routeSuggestion && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Mapa Ida */}
+                    <div className="flex flex-col items-center">
+                      <div className="w-full h-48 bg-white rounded-2xl shadow-inner mb-3 flex items-center justify-center text-gray-400 text-sm">
+                        Mapa da rota de ida
                       </div>
-                      <div>
-                        Distância:{" "}
-                        <strong>{selectedStudent.route.ida.distance}</strong>
+                      <div className="text-xs text-gray-700 text-center">
+                        <div>
+                          Tempo estimado:{" "}
+                          <strong>
+                            {ida.tempoEstimado || ida.time || "--"}
+                          </strong>
+                        </div>
+                        <div>
+                          Distância:{" "}
+                          <strong>
+                            {ida.distancia || ida.distance || "--"}
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mapa Volta */}
+                    <div className="flex flex-col items-center">
+                      <div className="w-full h-48 bg-white rounded-2xl shadow-inner mb-3 flex items-center justify-center text-gray-400 text-sm">
+                        Mapa da rota de volta
+                      </div>
+                      <div className="text-xs text-gray-700 text-center">
+                        <div>
+                          Tempo estimado:{" "}
+                          <strong>
+                            {volta.tempoEstimado || volta.time || "--"}
+                          </strong>
+                        </div>
+                        <div>
+                          Distância:{" "}
+                          <strong>
+                            {volta.distancia || volta.distance || "--"}
+                          </strong>
+                        </div>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Mapa Volta */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-full h-48 bg-white rounded-2xl shadow-inner mb-3 flex items-center justify-center text-gray-400 text-sm">
-                      Mapa da rota de volta
-                    </div>
-                    <div className="text-xs text-gray-700 text-center">
-                      <div>
-                        Tempo estimado:{" "}
-                        <strong>{selectedStudent.route.volta.time}</strong>
-                      </div>
-                      <div>
-                        Distância:{" "}
-                        <strong>{selectedStudent.route.volta.distance}</strong>
-                      </div>
-                    </div>
+                {!routeLoading && !routeError && !routeSuggestion && (
+                  <div className="text-center text-sm text-gray-700">
+                    Nenhuma sugestão de rota disponível para esta solicitação.
                   </div>
-                </div>
+                )}
 
-                {/* Observação / ações futuras */}
                 <div className="mt-6 text-xs text-gray-700 text-center">
                   Ajuste a rota final considerando outros alunos na linha. Em
                   uma próxima etapa podemos integrar com um serviço de mapas
