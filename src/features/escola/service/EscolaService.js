@@ -1,19 +1,9 @@
 // src/features/escola/services/EscolasService.js
 import axios from "axios";
+import api from "../../shared/utils/api";
 
-// Ajuste a baseURL conforme o endereço da sua API
-const api = axios.create({
-  baseURL: "http://10.5.36.14:5000/v1/api",
-});
 
-// Interceptor para enviar o JWT em todas as requisições
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+
 
 /* ============================================================================
  * ESCOLAS – API para gerenciamento de Escolas
