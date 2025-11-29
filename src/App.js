@@ -20,6 +20,7 @@ import RouteManagementScreen from './features/motorista/components/RouteManageme
 import StudentAssignmentScreen from './features/motorista/components/StudentAssignmentScreen.js';
 import DriverScreen from './features/motorista/components/DriverScreen';
 import PassengerProfileScreen from './features/motorista/components/PassengerProfileScreen.js';
+import MotoristaVehiclesScreen from './features/motorista/components/MotoristaVehiclesScreen.js';
 
 // Telas de responsável (NOVAS)
 import DependentesScreen from './features/responsavel/components/DependentesScreen';
@@ -96,6 +97,8 @@ function App() {
 
               {/* Gerenciamento da rota */}
               <Route path="/driver/manage-route" element={<RouteManagementScreen />} />
+
+              <Route path="/driver/veiculos" element={<MotoristaVehiclesScreen />} />
 
               {/* Configurações */}
               <Route path="/settings" element={<SettingsScreen />} />

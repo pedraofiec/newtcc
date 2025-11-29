@@ -15,6 +15,7 @@ const RegisterDriver = ({ goToLogin }) => {
   const [password, setPassword] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [valCnh, setValCnh] = React.useState('');
+  const [endereco, setEndereco] = React.useState('');
   const [placaVeiculo, setPlacaVeiculo] = React.useState('');
 
   // 💡 NOVOS ESTADOS PARA API
@@ -33,6 +34,7 @@ const RegisterDriver = ({ goToLogin }) => {
       phone, 
       email, 
       password,
+      endereco,
       placaVeiculo,
       valCnh
     };
@@ -118,7 +120,16 @@ const RegisterDriver = ({ goToLogin }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required
-          /><input
+          />
+          <input
+            type="text"
+            placeholder="Endereço Casa"
+            value={endereco}
+            onChange={(e) => setEndereco(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required
+          />
+          <input
             type="text"
             placeholder="Validade CNH(2025-11-08)"
             value={valCnh}
