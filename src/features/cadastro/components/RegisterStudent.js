@@ -1,9 +1,10 @@
 // src/features/cadastro/components/RegisterStudent.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaUser, FaPlus } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import { createDependente } from '../../responsavel/services/ResponsavelService';
 import './Register.css';
+import { listarEscolas } from '../../escola/service/EscolaService';
 
 const RegisterStudent = () => {
   const navigate = useNavigate();
@@ -12,6 +13,11 @@ const RegisterStudent = () => {
   const [cpf, setCpf] = React.useState('');
   const [dob, setDob] = React.useState('');
   const [school, setSchool] = React.useState('');
+  const [schools, setSchools] = React.useState([]);
+
+  useEffect(() => {
+    listarEscolas().then(setSchools).catch(console.log)
+  },[])
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -73,14 +79,18 @@ const RegisterStudent = () => {
             onChange={(e) => setDob(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 bg-gray-200 text-gray-500"
           />
+<select
+          className="w-full p-3 mb-6 border rounded-lg shadow-sm bg-teal-500 text-white text-lg font-semibold"
+          value={school}
+          onChange={e => setSchool(e.target.value)}
+        >
+          <option key={""} value={""} >Escolha a Escola</option>
+          {schools.map(s => (
+            
+            <option key={s.id} value={s.id} >{s.nome}</option>
+          ))}
+            </select>
 
-          <input
-            type="text"
-            placeholder="Escola"
-            value={school}
-            onChange={(e) => setSchool(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 bg-gray-200 placeholder-gray-500"
-          />
 
           <button onClick={handleSubmit}
             type="submit"
