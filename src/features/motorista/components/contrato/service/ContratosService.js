@@ -1,81 +1,45 @@
-// src/features/contratos/services/ContratosService.js
+import api from "../../../../shared/utils/api";
 
-import axios from "axios";
+// listar, buscar, criar, etc — usando api (baseURL do .env)
 
-const API_BASE_URL = "http://10.5.36.14:5000/v1/api"; // ajuste se necessário
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-});
-
-// adiciona o token JWT automaticamente
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-/**
- * Lista todos os contratos (Acesso Admin)
- * GET /v1/api/contratos
- */
+/** GET /contratos */
 export async function listarContratos() {
-  const response = await api.get("/contratos");
-  return response.data;
+  const res = await api.get("/v1/api/contratos");
+  return res.data;
 }
 
-/**
- * Busca um contrato pelo ID
- * GET /v1/api/contratos/{id}
- */
+/** GET /contratos/{id} */
 export async function getContratoById(id) {
-  const response = await api.get(`/contratos/${id}`);
-  return response.data;
+  const res = await api.get(`/v1/api/contratos/${id}`);
+  return res.data;
 }
 
-/**
- * Cria um novo contrato
- * POST /v1/api/contratos
- */
+/** POST /contratos */
 export async function criarContrato(dados) {
-  const response = await api.post("/contratos", dados);
-  return response.data;
+  const res = await api.post("/v1/api/contratos", dados);
+  return res.data;
 }
 
-/**
- * Atualiza um contrato pelo ID
- * PUT /v1/api/contratos/{id}
- */
+/** PUT /contratos/{id} */
 export async function atualizarContrato(id, dados) {
-  const response = await api.put(`/contratos/${id}`, dados);
-  return response.data;
+  const res = await api.put(`/v1/api/contratos/${id}`, dados);
+  return res.data;
 }
 
-/**
- * Deleta um contrato pelo ID
- * DELETE /v1/api/contratos/{id}
- */
+/** DELETE /contratos/{id} */
 export async function deletarContrato(id) {
-  const response = await api.delete(`/contratos/${id}`);
-  return response.data;
+  const res = await api.delete(`/v1/api/contratos/${id}`);
+  return res.data;
 }
 
-/**
- * Busca todos os contratos de um responsável
- * GET /v1/api/contratos/responsavel/{responsavelId}
- */
+/** listar por responsavel */
 export async function listarContratosPorResponsavel(responsavelId) {
-  const response = await api.get(`/contratos/responsavel/${responsavelId}`);
-  return response.data;
+  const res = await api.get(`/v1/api/contratos/responsavel/${responsavelId}`);
+  return res.data;
 }
 
-/**
- * Busca todos os contratos de um motorista
- * GET /v1/api/contratos/motorista/{motoristaId}
- */
+/** listar por motorista */
 export async function listarContratosPorMotorista(motoristaId) {
-  const response = await api.get(`/contratos/motorista/${motoristaId}`);
-  return response.data;
+  const res = await api.get(`/v1/api/contratos/motorista/${motoristaId}`);
+  return res.data;
 }

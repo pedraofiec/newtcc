@@ -2,27 +2,27 @@
 
 import React from "react";
 import { useNavigate, NavLink, Outlet } from "react-router-dom"; // <-- adicionado Outlet
-import { 
-    FaUserCircle, 
-    FaSignOutAlt, 
-    FaCog, 
-    FaMapMarkedAlt, 
+import {
+    FaUserCircle,
+    FaSignOutAlt,
+    FaCog,
+    FaMapMarkedAlt,
     FaCar,
-    FaUser,         
-    FaLock,         
-    FaBell,         
-    FaInfoCircle,   
+    FaUser,
+    FaLock,
+    FaBell,
+    FaInfoCircle,
     FaMoon,
-    FaArrowLeft 
+    FaArrowLeft
 } from "react-icons/fa";
-import { MdOutlineDashboard } from "react-icons/md"; 
+import { MdOutlineDashboard } from "react-icons/md";
 
 /* ============== Header ============== */
 export const Header = () => {
-    const navigate = useNavigate(); 
-    
+    const navigate = useNavigate();
+
     return (
-        <header className="fixed top-0 z-30 w-full border-b border-slate-100 bg-[#8AD7E1] shadow-sm h-16">
+        <header className="sticky top-0 z-30 w-full border-b border-slate-100 bg-[#8AD7E1] shadow-sm h-16">
             <div className="flex w-full items-center justify-between px-4 py-3 md:px-8">
                 <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-lg">
@@ -46,12 +46,12 @@ export const Header = () => {
                         <FaUserCircle className="w-5 h-5" />
                         Perfil
                     </button>
-                    <button 
+                    <button
                         onClick={() => {
                             // Lógica simples de logout
                             localStorage.removeItem("accessToken");
                             window.location.href = "/#/login";
-                        }} 
+                        }}
                         className="text-white hover:text-red-100"
                     >
                         <FaSignOutAlt className="w-5 h-5" />
@@ -67,14 +67,13 @@ export const Header = () => {
 /* ============== SideBar ============== */
 export const SideBar = () => {
     const linkClasses = ({ isActive }) =>
-        `flex items-center gap-3 p-3 rounded-lg transition duration-150 ${
-            isActive
-                ? "bg-[#8AD7E1] text-white font-semibold shadow-md"
-                : "text-slate-700 hover:bg-slate-100"
+        `flex items-center gap-3 p-3 rounded-lg transition duration-150 ${isActive
+            ? "bg-[#8AD7E1] text-white font-semibold shadow-md"
+            : "text-slate-700 hover:bg-slate-100"
         }`;
 
     return (
-        <nav 
+        <nav
             className="fixed inset-y-0 left-0 z-20 hidden w-60 transform overflow-y-auto border-r border-slate-100 bg-white p-4 shadow-xl transition duration-300 ease-in-out lg:flex lg:flex-col lg:pt-20"
         >
             <div className="flex flex-col gap-2">
@@ -90,14 +89,19 @@ export const SideBar = () => {
                     <FaMapMarkedAlt className="w-5 h-5" /> Rotas
                 </NavLink>
 
-                {/* 🚐 Botão novo: Veículos */}
                 <NavLink to="/driver/veiculos" className={linkClasses}>
                     <FaCar className="w-5 h-5" /> Veículos
+                </NavLink>
+
+                {/* 🔥 Novo botão de Contratos */}
+                <NavLink to="/driver/contratos" className={linkClasses}>
+                    <FaLock className="w-5 h-5" /> Contratos
                 </NavLink>
 
                 <NavLink to="/settings/perfil" className={linkClasses}>
                     <FaUserCircle className="w-5 h-5" /> Perfil
                 </NavLink>
+
             </div>
         </nav>
     );
