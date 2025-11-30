@@ -1,57 +1,115 @@
 // src/features/home/components/settings/EditProfileScreen.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaUser, FaSave, FaEdit } from "react-icons/fa";
+
+import { getMe } from "../../../shared/utils/UserService";
 
 const EditProfileScreen = () => {
   const navigate = useNavigate();
 
-  // Dados salvos do perfil (mock – depois pode vir do backend / store)
-  const [profile, setProfile] = useState({
-    name: "João da Silva",
-    email: "joao@gmail.com",
-    phone: "(11) 98765-4321",
-    role: "Motorista",
-  });
-
-  // Estado do modo (visualização x edição)
+  const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Estado do formulário de edição (inicia com os dados do perfil)
-  const [name, setName] = useState(profile.name);
-  const [email, setEmail] = useState(profile.email);
-  const [phone, setPhone] = useState(profile.phone);
+  // campos editáveis
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
+  // campos só exibição
+  const [cnh, setCnh] = useState("");
+  const [valCnh, setValCnh] = useState(""); // não vem no /users/me ainda
+  const [userId, setUserId] = useState("");
+
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  // 🔹 carrega dados do usuário logado ao abrir a tela
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoadingProfile(true);
+        setError(null);
+
+        const data = await getMe();
+
+        // JSON do /v1/api/users/me (Swagger):
+        // {
+        //   "userId": "....",
+        //   "nome": "Maria Souza",
+        //   "email": "maria@...",
+        //   "role": "MOTORISTA",
+        //   "picture": "...",
+        //   "cpfResponsavel": "...",
+        //   "enderecoCasa": "...",
+        //   "cnh": "01234567890",
+        //   "cpfMotorista": "99988877766"
+        // }
+        const perfil = {
+          userId: data.userId,
+          name: data.nome || "",
+          email: data.email || "",
+          role: data.role || "MOTORISTA",
+          cnh: data.cnh || "",
+          // se um dia o back devolver valCnh aqui, é só trocar:
+          valCnh: data.valCnh || "",
+        };
+
+        setProfile(perfil);
+        setUserId(perfil.userId);
+        setName(perfil.name);
+        setEmail(perfil.email);
+        setCnh(perfil.cnh);
+        setValCnh(perfil.valCnh);
+      } catch (err) {
+        console.error(err);
+        setError("Não foi possível carregar os dados do motorista.");
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // 🔹 por enquanto NÃO existe PUT de motorista no back,
+  // então só atualizamos o estado local e avisamos o usuário
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(false);
 
-    // aqui entraria chamada real de API
-    setTimeout(() => {
-      // Atualiza o "perfil salvo" com os dados do formulário
-      setProfile({
-        ...profile,
-        name,
-        email,
-        phone,
-      });
-      setLoading(false);
-      setSuccess(true);
-      setIsEditing(false);
-    }, 1000);
+    // atualiza apenas o state local (pra refletir na tela)
+    const perfilAtualizado = {
+      userId,
+      name,
+      email,
+      cnh,
+      valCnh,
+      role: profile?.role || "MOTORISTA",
+    };
+
+    setProfile(perfilAtualizado);
+    setSuccess(true);
+    setLoading(false);
+    setIsEditing(false);
+
+    // aviso amigável
+    console.warn(
+      "Ainda não existe endpoint de atualização de motorista no backend (PUT /motoristas)."
+    );
   };
 
   const handleCancelEdit = () => {
-    // Volta o formulário para os valores do perfil salvo
-    setName(profile.name);
-    setEmail(profile.email);
-    setPhone(profile.phone);
+    if (profile) {
+      setName(profile.name);
+      setEmail(profile.email);
+      setCnh(profile.cnh);
+      setValCnh(profile.valCnh);
+      setUserId(profile.userId);
+    }
     setIsEditing(false);
     setError(null);
   };
@@ -75,26 +133,35 @@ const EditProfileScreen = () => {
         </div>
         <p className="text-sm text-slate-500 mb-4">
           {isEditing
-            ? "Atualize seus dados pessoais e de contato utilizados na plataforma."
+            ? "Atualize seus dados pessoais utilizados na plataforma (apenas localmente, ainda sem salvar no servidor)."
             : "Veja suas informações cadastradas na plataforma."}
         </p>
         <hr className="border-slate-200 mb-5" />
 
         {/* card principal */}
         <div className="bg-white rounded-3xl shadow-md p-5 md:p-7">
+          {loadingProfile && (
+            <div className="text-sm text-slate-600 mb-3">
+              Carregando dados do motorista...
+            </div>
+          )}
+
           {error && (
             <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
-              Erro ao salvar: {error}
+              {error}
             </div>
           )}
           {success && (
             <div className="p-3 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
-              Perfil atualizado com sucesso!
+              Perfil atualizado localmente!
+              <br />
+              (quando existir endpoint de atualização no back, vamos salvar lá
+              também 😉)
             </div>
           )}
 
           {/* ===================== MODO VISUALIZAÇÃO ===================== */}
-          {!isEditing && (
+          {!isEditing && profile && !loadingProfile && (
             <div className="flex flex-col items-center gap-6">
               {/* Avatar + nome */}
               <div className="flex flex-col items-center gap-3">
@@ -111,41 +178,13 @@ const EditProfileScreen = () => {
 
               {/* Informações em cards */}
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-slate-600 mb-1">
-                    Nome completo
-                  </span>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800">
-                    {profile.name}
-                  </div>
-                </div>
-
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-slate-600 mb-1">
-                    E-mail
-                  </span>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 break-all">
-                    {profile.email}
-                  </div>
-                </div>
-
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-slate-600 mb-1">
-                    Telefone
-                  </span>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800">
-                    {profile.phone}
-                  </div>
-                </div>
-
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-slate-600 mb-1">
-                    Tipo de conta
-                  </span>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800">
-                    {profile.role}
-                  </div>
-                </div>
+                <InfoField label="Nome completo" value={profile.name} />
+                <InfoField label="E-mail" value={profile.email} />
+                <InfoField label="CNH" value={profile.cnh || "-"} />
+                <InfoField
+                  label="Validade da CNH"
+                  value={profile.valCnh || "-"}
+                />
               </div>
 
               {/* Botão Editar perfil */}
@@ -155,6 +194,7 @@ const EditProfileScreen = () => {
                   setSuccess(false);
                 }}
                 className="mt-4 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#8AD7E1] text-sm font-semibold text-white hover:bg-[#7bc8d2] transition"
+                disabled={loadingProfile}
               >
                 <FaEdit /> Editar perfil
               </button>
@@ -164,55 +204,30 @@ const EditProfileScreen = () => {
           {/* ===================== MODO EDIÇÃO ===================== */}
           {isEditing && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-xs font-semibold text-slate-600 mb-1"
-                >
-                  Nome completo
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="mt-1 block w-full border border-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[#8AD7E1] focus:border-[#8AD7E1] outline-none"
-                  required
-                />
-              </div>
+              <FormInput
+                id="name"
+                label="Nome completo"
+                type="text"
+                value={name}
+                onChange={setName}
+                required
+              />
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-xs font-semibold text-slate-600 mb-1"
-                >
-                  E-mail
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full border border-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[#8AD7E1] focus:border-[#8AD7E1] outline-none"
-                  required
-                />
-              </div>
+              <FormInput
+                id="email"
+                label="E-mail"
+                type="email"
+                value={email}
+                onChange={setEmail}
+                required
+              />
 
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-xs font-semibold text-slate-600 mb-1"
-                >
-                  Telefone
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="mt-1 block w-full border border-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[#8AD7E1] focus:border-[#8AD7E1] outline-none"
-                />
-              </div>
+              {/* CNH e validade só leitura por enquanto */}
+              <InfoField label="CNH (somente leitura)" value={cnh || "-"} />
+              <InfoField
+                label="Validade da CNH (somente leitura)"
+                value={valCnh || "-"}
+              />
 
               <div className="mt-2 flex flex-col-reverse md:flex-row md:justify-end gap-3">
                 <button
@@ -239,10 +254,52 @@ const EditProfileScreen = () => {
               </div>
             </form>
           )}
+
+          {!loadingProfile && !profile && !error && (
+            <p className="text-sm text-slate-600">
+              Nenhum dado de motorista encontrado.
+            </p>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
+// componentes auxiliares
+
+function InfoField({ label, value }) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-xs font-semibold text-slate-600 mb-1">
+        {label}
+      </span>
+      <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 break-all">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function FormInput({ id, label, type, value, onChange, required }) {
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="block text-xs font-semibold text-slate-600 mb-1"
+      >
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        className="mt-1 block w-full border border-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[#8AD7E1] focus:border-[#8AD7E1] outline-none"
+      />
+    </div>
+  );
+}
 
 export default EditProfileScreen;

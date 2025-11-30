@@ -39,9 +39,9 @@ const NovoContratoPage = () => {
     let cancelled = false;
     async function fetchResponsaveis() {
       try {
-        const res = await api.get("/responsaveis");
+        const res = await api.get("/responsaveis/me");
 
-        console.log("🚀 Resposta da API /responsaveis:", res.data); // <--- AQUI
+        console.log("🚀 Resposta da API /responsaveis/me:", res.data); // <--- AQUI
 
         if (cancelled) return;
 
@@ -78,7 +78,7 @@ const NovoContratoPage = () => {
     if (!id) return;
 
     try {
-      const res = await api.get(`/responsaveis/${id}`);
+      const res = await api.get(`/responsaveis/me/${id}`);
 
       const deps =
         res.data?.dependentes ||
