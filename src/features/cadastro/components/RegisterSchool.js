@@ -12,6 +12,7 @@ const RegisterSchool = ({ goToLogin }) => {
   const [endereco, setEndereco] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [senha, setSenha] = React.useState('');
+  const [telefone, setTelefone] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
@@ -82,6 +83,14 @@ const RegisterSchool = ({ goToLogin }) => {
             required 
           />
           <input 
+            type="text" 
+            placeholder="Telefone" 
+            value={telefone} 
+            onChange={(e) => setTelefone(e.target.value)} 
+            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
+            required 
+          />
+          <input 
             type="email" 
             placeholder="Email" 
             value={email} 
@@ -97,6 +106,7 @@ const RegisterSchool = ({ goToLogin }) => {
             className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
             required 
           />
+
           
           <button 
             type="submit" 

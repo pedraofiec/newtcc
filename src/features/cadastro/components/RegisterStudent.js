@@ -12,21 +12,23 @@ const RegisterStudent = () => {
   const [fullName, setFullName] = React.useState('');
   const [cpf, setCpf] = React.useState('');
   const [dob, setDob] = React.useState('');
+  const [nivelEscolar, setNivelEscolar] = React.useState('');
   const [school, setSchool] = React.useState('');
   const [schools, setSchools] = React.useState([]);
 
   useEffect(() => {
     listarEscolas().then(setSchools).catch(console.log)
-  },[])
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    
+
     const dependente = {
       nome: fullName,
       cpf: cpf,
       dataNascimento: dob,
+      nivelEscolar: nivelEscolar,
       escolaId: school
     };
 
@@ -79,17 +81,24 @@ const RegisterStudent = () => {
             onChange={(e) => setDob(e.target.value)}
             className="w-full p-3 rounded-md border border-gray-300 bg-gray-200 text-gray-500"
           />
-<select
-          className="w-full p-3 mb-6 border rounded-lg shadow-sm bg-teal-500 text-white text-lg font-semibold"
-          value={school}
-          onChange={e => setSchool(e.target.value)}
-        >
-          <option key={""} value={""} >Escolha a Escola</option>
-          {schools.map(s => (
-            
-            <option key={s.id} value={s.id} >{s.nome}</option>
-          ))}
-            </select>
+          <input
+            type="text"
+            placeholder="Ano escolar"
+            value={nivelEscolar}
+            onChange={(e) => setNivelEscolar(e.target.value)}
+            className="w-full p-3 rounded-md border border-gray-300 bg-gray-200 placeholder-gray-500"
+          />
+          <select
+            className="w-full p-3 mb-6 border rounded-lg shadow-sm bg-teal-500 text-white text-lg font-semibold"
+            value={school}
+            onChange={e => setSchool(e.target.value)}
+          >
+            <option key={""} value={""} >Escolha a Escola</option>
+            {schools.map(s => (
+
+              <option key={s.id} value={s.id} >{s.nome}</option>
+            ))}
+          </select>
 
 
           <button onClick={handleSubmit}
