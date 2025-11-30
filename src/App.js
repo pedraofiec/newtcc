@@ -21,6 +21,9 @@ import StudentAssignmentScreen from './features/motorista/components/StudentAssi
 import DriverScreen from './features/motorista/components/DriverScreen';
 import PassengerProfileScreen from './features/motorista/components/PassengerProfileScreen.js';
 import MotoristaVehiclesScreen from './features/motorista/components/MotoristaVehiclesScreen.js';
+import ContratosPage from './features/motorista/components/contrato/components/ContratosPage.js';
+import NovoContratoPage from './features/motorista/components/contrato/components/NovoContratoPage.js';
+import EditarContratoPage from './features/motorista/components/contrato/components/EditarContratoPage.js';
 
 // Telas de responsável (NOVAS)
 import DependentesScreen from './features/responsavel/components/DependentesScreen';
@@ -99,6 +102,11 @@ function App() {
               <Route path="/driver/manage-route" element={<RouteManagementScreen />} />
 
               <Route path="/driver/veiculos" element={<MotoristaVehiclesScreen />} />
+
+              <Route path="/driver/contratos" element={<ContratosPage />} />
+              <Route path="/driver/contratos/novo" element={<NovoContratoPage />} />
+              <Route path="/driver/contratos/:id/editar" element={<EditarContratoPage />} />
+
 
               {/* Configurações */}
               <Route path="/settings" element={<SettingsScreen />} />
