@@ -1,7 +1,7 @@
 // src/features/responsavel/services/MotoristasService.js
 import axios from "axios";
 
-const API_BASE_URL = "http://10.5.36.14:5000/v1/api"; // ajuste se mudar
+const API_BASE_URL = "http://localhost/v1/api"; // ajuste se mudar
 
 const api = axios.create({
   baseURL: API_BASE_URL,
