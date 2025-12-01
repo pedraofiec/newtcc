@@ -1,3 +1,4 @@
+// src/features/responsavel/components/ResponsavelProfileScreen.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaUser, FaSave, FaEdit } from "react-icons/fa";
@@ -143,7 +144,8 @@ const ResponsavelProfileScreen = () => {
 
   return (
     <div className="w-full flex flex-col items-center font-sans">
-      <div className="w-full max-w-3xl mt-6 px-4 md:px-0">
+      {/* container mais largo */}
+      <div className="w-full max-w-4xl mt-10 px-4 md:px-0">
         {/* Voltar */}
         <button
           onClick={() => navigate("/home")}
@@ -168,8 +170,8 @@ const ResponsavelProfileScreen = () => {
 
         <hr className="border-slate-200 mb-5" />
 
-        {/* Card principal */}
-        <div className="bg-white rounded-3xl shadow-md p-5 md:p-7">
+        {/* Card principal – MAIOR */}
+        <div className="bg-white rounded-[32px] shadow-lg p-8 md:p-10">
           {loadingProfile && (
             <div className="text-sm text-slate-600 mb-3">
               Carregando suas informações...
@@ -191,19 +193,19 @@ const ResponsavelProfileScreen = () => {
           {/* =================== VISUALIZAÇÃO =================== */}
           {!isEditing && profile && (
             <div className="flex flex-col items-center gap-6">
-              {/* Avatar */}
-              <div className="w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center">
-                <span className="text-3xl text-sky-700">👩‍👧</span>
+              {/* Avatar maior */}
+              <div className="w-24 h-24 rounded-full bg-sky-100 flex items-center justify-center">
+                <span className="text-4xl text-sky-700">👩‍👧</span>
               </div>
 
               {/* Nome e role */}
               <div className="text-center">
-                <p className="text-lg font-semibold text-gray-800">{profile.nome}</p>
+                <p className="text-xl font-semibold text-gray-800">{profile.nome}</p>
                 <p className="text-sm text-gray-500">{profile.role}</p>
               </div>
 
               {/* Cards dos dados */}
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Field label="Nome Completo" value={profile.nome} />
                 <Field label="E-mail" value={profile.email || "-"} />
                 <Field label="Telefone" value={profile.telefone || "-"} />
@@ -218,7 +220,7 @@ const ResponsavelProfileScreen = () => {
               {/* Botão Editar */}
               <button
                 onClick={() => setIsEditing(true)}
-                className="mt-4 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#8AD7E1] text-sm font-semibold text-white hover:bg-[#7bc8d2] transition"
+                className="mt-6 inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-[#8AD7E1] text-sm font-semibold text-white hover:bg-[#7bc8d2] transition"
                 disabled={loadingProfile}
               >
                 <FaEdit /> Editar perfil
@@ -249,7 +251,7 @@ const ResponsavelProfileScreen = () => {
               </div>
 
               {/* Botões */}
-              <div className="flex flex-col-reverse md:flex-row md:justify-end gap-3 mt-4">
+              <div className="flex flex-col-reverse md:flex-row md:justify-end gap-3 mt-6">
                 <button
                   type="button"
                   onClick={cancelar}

@@ -2,37 +2,42 @@
 import { jwtDecode } from "jwt-decode";
 
 /**
- * Retorna os dados do usuário logado **sem** chamar o backend.
- * Ele lê o token do localStorage e decodifica o JWT.
- *
- * Assim paramos de usar o endpoint inexistente /users/me.
+ * Retorna dados do usuário logado lendo apenas o JWT.
  */
 export async function getMe() {
   const token = localStorage.getItem("accessToken");
 
   if (!token) {
-    throw new Error("Usuário não autenticado (sem token).");
+    throw new Error("Usuário não autenticado.");
   }
 
   try {
     const decoded = jwtDecode(token);
 
-    // Ajuste esses campos de acordo com o conteúdo REAL do seu token
     return {
-      userId: decoded.userId || decoded.id || decoded.sub || "",
-      nome: decoded.nome || decoded.name || "",
-      email: decoded.email || decoded.username || decoded.sub || "",
+      id:
+        decoded.userId ||
+        decoded.id ||
+        decoded.sub || // << geralmente o correto
+        "",
+      nome:
+        decoded.nome ||
+        decoded.name ||
+        decoded.nomeResponsavel ||
+        "",
+      email:
+        decoded.email ||
+        decoded.username ||
+        "",
       role:
         decoded.role ||
         decoded.tipo ||
         (Array.isArray(decoded.authorities) && decoded.authorities[0]) ||
         decoded.authority ||
         "",
-      cnh: decoded.cnh || "",
-      valCnh: decoded.valCnh || "",
     };
   } catch (e) {
-    console.error("Erro ao decodificar token em getMe:", e);
-    throw new Error("Token inválido ou corrompido.");
+    console.error("Erro ao decodificar token:", e);
+    throw new Error("Token inválido.");
   }
 }
