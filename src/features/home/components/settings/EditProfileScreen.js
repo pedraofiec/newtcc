@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaUser, FaSave, FaEdit } from "react-icons/fa";
 
 import { getMe } from "../../../shared/utils/UserService";
+import { listarMotoristas } from "../../../motorista/Services/MotoristaService.js";
 
 const EditProfileScreen = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const EditProfileScreen = () => {
 
   // campos só exibição
   const [cnh, setCnh] = useState("");
-  const [valCnh, setValCnh] = useState(""); // não vem no /users/me ainda
+  const [valCnh, setValCnh] = useState("");
   const [userId, setUserId] = useState("");
 
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -32,28 +33,29 @@ const EditProfileScreen = () => {
         setLoadingProfile(true);
         setError(null);
 
-        const data = await getMe();
+        // 1) dados básicos a partir do token (getMe -> JWT decodificado)
+        const me = await getMe();
+        // me = { userId, nome, email, role, ... }
 
-        // JSON do /v1/api/users/me (Swagger):
-        // {
-        //   "userId": "....",
-        //   "nome": "Maria Souza",
-        //   "email": "maria@...",
-        //   "role": "MOTORISTA",
-        //   "picture": "...",
-        //   "cpfResponsavel": "...",
-        //   "enderecoCasa": "...",
-        //   "cnh": "01234567890",
-        //   "cpfMotorista": "99988877766"
-        // }
+        // 2) busca todos os motoristas no backend
+        const motoristas = await listarMotoristas();
+
+        // 3) tenta achar o motorista correspondente ao usuário logado
+        const motorista = motoristas.find((m) => {
+          return m.userId === me.userId || m.email === me.email;
+        });
+
+        // 4) monta o perfil com o máximo de dados possível
         const perfil = {
-          userId: data.userId,
-          name: data.nome || "",
-          email: data.email || "",
-          role: data.role || "MOTORISTA",
-          cnh: data.cnh || "",
-          // se um dia o back devolver valCnh aqui, é só trocar:
-          valCnh: data.valCnh || "",
+          userId: me.userId,
+          name:
+            (motorista && (motorista.nomeMotorista || motorista.nome)) ||
+            me.nome ||
+            "",
+          email: me.email || (motorista && motorista.email) || "",
+          role: me.role || "MOTORISTA",
+          cnh: (motorista && motorista.cnh) || "",
+          valCnh: (motorista && motorista.valCnh) || "",
         };
 
         setProfile(perfil);
@@ -96,7 +98,6 @@ const EditProfileScreen = () => {
     setLoading(false);
     setIsEditing(false);
 
-    // aviso amigável
     console.warn(
       "Ainda não existe endpoint de atualização de motorista no backend (PUT /motoristas)."
     );
