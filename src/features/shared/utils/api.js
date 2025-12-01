@@ -6,17 +6,25 @@ const { showLoading, showSuccess, showError, closeModal } =
   useStatusModalStore.getState();
 
 const api = axios.create({
-  baseURL: `${process.env.REACT_APP_BACKEND_URL}/v1/api`,
+  baseURL: process.env.REACT_APP_BACKEND_URL, // ex: http://localhost:5000
 });
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
     showLoading("Loading...");
+
     const token = localStorage.getItem("accessToken");
-    if (token) {
+
+    // NÃO mandar Authorization em login/registro
+    const isAuthEndpoint =
+      config.url?.startsWith("/v1/api/auth/login") ||
+      config.url?.startsWith("/v1/api/auth/register");
+
+    if (token && !isAuthEndpoint) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)

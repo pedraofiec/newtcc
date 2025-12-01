@@ -1,8 +1,9 @@
-// src/pages/driver/NovoContratoPage.js
-import React, { useEffect, useState } from "react";
-import { criarContrato } from "../service/ContratosService";
+// src/features/motorista/components/contrato/components/NovoContratoPage.js
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+
+import { criarContrato } from "../service/ContratosService";
 import api from "../../../../shared/utils/api";
 
 const NovoContratoPage = () => {
@@ -11,8 +12,8 @@ const NovoContratoPage = () => {
   const [responsaveis, setResponsaveis] = useState([]);
   const [responsavelId, setResponsavelId] = useState("");
 
-  const [dependentes, setDependentes] = useState([]);      // <-- ADICIONADO
-  const [dependenteId, setDependenteId] = useState("");    // <-- ADICIONADO
+  const [dependentes, setDependentes] = useState([]);
+  const [dependenteId, setDependenteId] = useState("");
 
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
@@ -31,45 +32,39 @@ const NovoContratoPage = () => {
         return payload._embedded[keys[0]];
       }
     }
-    const arr = Object.values(payload).find(v => Array.isArray(v));
+    const arr = Object.values(payload).find((v) => Array.isArray(v));
     return arr || [];
   }
 
-  useEffect(() => {
-    let cancelled = false;
-    async function fetchResponsaveis() {
-      try {
-        const res = await api.get("/responsaveis/me");
+  const fetchResponsaveis = useCallback(async () => {
+    try {
+      // ⚠️ NO SEU BACK, ESSA ROTA É SEM /v1/api
+      const res = await api.get("/responsaveis");
 
-        console.log("🚀 Resposta da API /responsaveis/me:", res.data); // <--- AQUI
+      console.log("🚀 Resposta da API /responsaveis:", res.data);
 
-        if (cancelled) return;
+      const list = normalizeResponsaveis(res.data);
+      setResponsaveis(list);
 
-        const list = normalizeResponsaveis(res.data);
-        setResponsaveis(list);
-
-        if (!list || list.length === 0) {
-          toast("Nenhum responsável encontrado.");
-        }
-
-      } catch (err) {
-        console.error("Erro ao carregar responsáveis:", err);
-        toast.error("Falha ao carregar responsáveis.");
-
-        // Mock para UI não quebrar
-        setResponsaveis([
-          { id: "mock-1", nome: "Responsável (mock) — sem conexão" }
-        ]);
+      if (!list || list.length === 0) {
+        toast("Nenhum responsável encontrado.");
       }
+    } catch (err) {
+      console.error("Erro ao carregar responsáveis:", err);
+      toast.error("Falha ao carregar responsáveis.");
+
+      // mock pra não quebrar a UI
+      setResponsaveis([
+        { id: "mock-1", nomeResponsavel: "Responsável (mock) — sem conexão" },
+      ]);
     }
-
-    fetchResponsaveis();
-    return () => { cancelled = true; };
-
   }, []);
 
+  useEffect(() => {
+    fetchResponsaveis();
+  }, [fetchResponsaveis]);
 
-  // 🔥 QUANDO SELECIONAR RESPONSÁVEL → CARREGAR DEPENDENTES
+  // QUANDO SELECIONAR RESPONSÁVEL → CARREGAR DEPENDENTES
   async function handleSelectResponsavel(id) {
     setResponsavelId(id);
     setDependenteId("");
@@ -78,20 +73,34 @@ const NovoContratoPage = () => {
     if (!id) return;
 
     try {
-      const res = await api.get(`/responsaveis/me/${id}`);
+      // idem: dependentes também sem /v1/api
+      const res = await api.get("/responsaveis/dependentes/criancas");
 
-      const deps =
+      let deps =
         res.data?.dependentes ||
         res.data?.criancas ||
         res.data?.children ||
+        res.data ||
         [];
+
+      if (Array.isArray(deps)) {
+        deps = deps.filter((d) => {
+          const respId =
+            d.responsavelId ||
+            d.responsavel?.id ||
+            d.responsavelIdResponsavel ||
+            null;
+          return !respId || respId === id;
+        });
+      } else {
+        deps = [];
+      }
 
       setDependentes(deps);
 
       if (deps.length === 0) {
         toast("Esse responsável ainda não possui dependentes.");
       }
-
     } catch (err) {
       console.error("Erro ao carregar dependentes:", err);
       toast.error("Falha ao carregar dependentes.");
@@ -111,17 +120,16 @@ const NovoContratoPage = () => {
       dataFim,
       valorMensal: valorMensal ? Number(valorMensal) : 0,
       status,
-      responsavelId,   // <-- ADICIONADO
-      dependenteId     // <-- ADICIONADO
+      responsavelId,
+      dependenteId,
     };
 
     try {
-      const result = await criarContrato(payload);
+      const result = await criarContrato(payload); // chama /v1/api/contratos
       console.log("Contrato criado:", result);
 
       toast.success("Contrato criado com sucesso!");
       navigate("/driver/contratos");
-
     } catch (err) {
       console.error("Erro ao criar contrato:", err);
       toast.error("Falha ao criar contrato. Veja console.");
@@ -132,8 +140,10 @@ const NovoContratoPage = () => {
     <div>
       <h1 className="text-2xl font-semibold mb-4">Novo Contrato</h1>
 
-      <form onSubmit={handleCreate} className="space-y-4 bg-white p-6 rounded shadow">
-
+      <form
+        onSubmit={handleCreate}
+        className="space-y-4 bg-white p-6 rounded shadow"
+      >
         {/* RESPONSÁVEL */}
         <div>
           <label className="block mb-1">Responsável</label>
@@ -151,14 +161,14 @@ const NovoContratoPage = () => {
               <option value="">-- Selecione um responsável --</option>
               {responsaveis.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.nomeResponsavel}
+                  {r.nomeResponsavel || r.nome || "Responsável sem nome"}
                 </option>
               ))}
             </select>
           )}
         </div>
 
-        {/* DEPENDENTES – aparece só DEPOIS de escolher o responsável */}
+        {/* DEPENDENTES */}
         {responsavelId && (
           <div>
             <label className="block mb-1">Dependente</label>
@@ -176,7 +186,7 @@ const NovoContratoPage = () => {
                 <option value="">-- Selecione um dependente --</option>
                 {dependentes.map((d) => (
                   <option key={d.id} value={d.id}>
-                    {d.nome}
+                    {d.nome || d.nomeCrianca || "Dependente sem nome"}
                   </option>
                 ))}
               </select>
@@ -188,22 +198,41 @@ const NovoContratoPage = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label>Data Início</label>
-            <input type="date" className="w-full p-2 border rounded" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} />
+            <input
+              type="date"
+              className="w-full p-2 border rounded"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+            />
           </div>
           <div>
             <label>Data Fim</label>
-            <input type="date" className="w-full p-2 border rounded" value={dataFim} onChange={(e) => setDataFim(e.target.value)} />
+            <input
+              type="date"
+              className="w-full p-2 border rounded"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
+            />
           </div>
         </div>
 
         <div>
           <label>Valor Mensal</label>
-          <input type="number" className="w-full p-2 border rounded" value={valorMensal} onChange={(e) => setValorMensal(e.target.value)} />
+          <input
+            type="number"
+            className="w-full p-2 border rounded"
+            value={valorMensal}
+            onChange={(e) => setValorMensal(e.target.value)}
+          />
         </div>
 
         <div>
           <label>Status</label>
-          <select className="w-full p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
+          <select
+            className="w-full p-2 border rounded"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
             <option value="ATIVO">ATIVO</option>
             <option value="INATIVO">INATIVO</option>
             <option value="PENDENTE">PENDENTE</option>
@@ -211,7 +240,10 @@ const NovoContratoPage = () => {
           </select>
         </div>
 
-        <button type="submit" className="bg-sky-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-sky-600 text-white px-4 py-2 rounded"
+        >
           Criar Contrato
         </button>
       </form>
