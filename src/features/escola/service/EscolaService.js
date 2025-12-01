@@ -2,9 +2,6 @@
 import axios from "axios";
 import api from "../../shared/utils/api";
 
-
-
-
 /* ============================================================================
  * ESCOLAS – API para gerenciamento de Escolas
  * Swagger:
