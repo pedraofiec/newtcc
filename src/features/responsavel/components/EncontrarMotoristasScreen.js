@@ -57,6 +57,24 @@ export default function EncontrarMotoristasScreen() {
     return matchTexto && matchChip;
   });
 
+  function irParaPerfilMotorista(m) {
+    // tenta descobrir o campo correto de ID vindo do backend
+    const idMotorista =
+      m.id ||
+      m.motoristaId ||
+      m.uuid ||
+      m.idMotorista;
+
+    if (!idMotorista) {
+      console.error("Motorista sem ID válido:", m);
+      alert("Não foi possível abrir o perfil deste motorista (ID ausente).");
+      return;
+    }
+
+    // 🔹 Usa rota ABSOLUTA para bater com App.js → "/motoristas/:id"
+    navigate(`/motoristas/${idMotorista}`);
+  }
+
   return (
     <div className="w-full min-h-full px-6 py-6 flex flex-col">
       {/* Header */}
@@ -145,7 +163,7 @@ export default function EncontrarMotoristasScreen() {
 
           return (
             <div
-              key={m.id}
+              key={m.id || m.motoristaId || m.uuid || m.idMotorista}
               className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 hover:shadow-2xl transition"
             >
               <div className="flex flex-col items-center">
@@ -166,7 +184,7 @@ export default function EncontrarMotoristasScreen() {
 
                 {/* Botão ver perfil */}
                 <button
-                  onClick={() => navigate(`/motorista/${m.id}`)}
+                  onClick={() => irParaPerfilMotorista(m)}
                   className="mt-6 w-full bg-[#73C8D5] text-white py-2 rounded-full shadow hover:bg-[#6abcca] text-sm"
                 >
                   Ver perfil

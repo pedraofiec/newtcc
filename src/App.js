@@ -1,13 +1,9 @@
-// src/App.js
 import React, { useEffect } from 'react';
 
 // Importa os componentes de cada funcionalidade
 import SplashScreen from './features/splash/SplashScreen';
 import UserTypeSelection from './features/splash/components/UserTypeSelection';
 import ForgotPassword from './features/splash/components/ForgotPassword';
-
-// Guarda de rota para motorista
-
 
 // Componentes de cadastro
 import RegisterResponsible from './features/cadastro/components/RegisterResponsible';
@@ -25,12 +21,14 @@ import ContratosPage from './features/motorista/components/contrato/components/C
 import NovoContratoPage from './features/motorista/components/contrato/components/NovoContratoPage.js';
 import EditarContratoPage from './features/motorista/components/contrato/components/EditarContratoPage.js';
 
-// Telas de responsável (NOVAS)
+// Telas de responsável
 import DependentesScreen from './features/responsavel/components/DependentesScreen';
 import EncontrarMotoristasScreen from './features/responsavel/components/EncontrarMotoristasScreen';
 import StudentProfileScreen from './features/responsavel/components/StudentProfileScreen.js';
 import ResponsavelProfileScreen from './features/responsavel/components/ResponsavelProfileScreen.js';
 import ResponsavelLayout from './features/responsavel/components/layout/ResponsavelLayout';
+// 🔹 NOVA TELA: perfil público do motorista para o responsável
+import MotoristaPublicProfileScreen from './features/responsavel/components/MotoristaPublicProfileScreen.js';
 
 //Tela Escola
 import EscolaLayout from './features/escola/components/layout/EscolaLayout.js';
@@ -107,7 +105,6 @@ function App() {
               <Route path="/driver/contratos/novo" element={<NovoContratoPage />} />
               <Route path="/driver/contratos/:id/editar" element={<EditarContratoPage />} />
 
-
               {/* Configurações */}
               <Route path="/settings" element={<SettingsScreen />} />
               <Route path="/settings/perfil" element={<EditProfileScreen />} />
@@ -126,7 +123,6 @@ function App() {
 
               {/* Solicitações = EncontrarMotoristas */}
               <Route path="solicitacoes" element={<EncontrarMotoristasScreen />} />
-              {/* (se em algum lugar você ainda usar /encontrar-motoristas, também deixo funcionando) */}
               <Route path="encontrar-motoristas" element={<EncontrarMotoristasScreen />} />
 
               {/* Perfil do dependente */}
@@ -135,22 +131,26 @@ function App() {
               {/* Perfil do responsável */}
               <Route path="profile" element={<ResponsavelProfileScreen />} />
 
-              {/* Configurações */}
+              {/* ✅ NOVA ROTA: perfil público do motorista */}
+              <Route path="motoristas/:id" element={<MotoristaPublicProfileScreen />} />
+
+              {/* Configurações (se quiser manter aqui também) */}
               <Route path="settings" element={<SettingsScreen />} />
               <Route path="settings/alterar-senha" element={<ChangePasswordScreen />} />
             </Route>
           )}
 
+          {/* 🔒 ROTAS EXCLUSIVAS DA ESCOLA */}
           {tipo === "ROLE_ESCOLA" && (
             <Route path="/" element={<EscolaLayout />}>
               {/* Página inicial da escola → estudantes */}
               <Route index element={<EscolaHomeScreen />} />
               <Route path="home" element={<EscolaHomeScreen />} />
 
-              {/* Perfil da escola (a tela de edição que fizemos) */}
+              {/* Perfil da escola */}
               <Route path="profile" element={<EscolaProfileScreen />} />
 
-              {/* ✅ NOVA ROTA: perfil de aluno */}
+              {/* Perfil de aluno */}
               <Route path="students/:id" element={<EscolaStudentProfileScreen />} />
             </Route>
           )}
