@@ -27,17 +27,24 @@ export const EscolaHeader = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Botão Perfil do header → /escola/profile */}
+          {/* 🔴 CORREÇÃO AQUI: 
+             Antes estava "/escola/profile", mudei para "/profile" 
+             para igualar ao link da Sidebar.
+          */}
           <button
-            onClick={() => navigate("/escola/profile")}
+            onClick={() => navigate("/profile")} 
             className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition duration-150"
           >
             <FaUserCircle className="w-5 h-5" />
             Perfil
           </button>
+          
           <button
             onClick={() => {
               localStorage.removeItem("accessToken");
+              // Limpa IDs também para evitar cache sujo
+              localStorage.removeItem("escolaId");
+              localStorage.removeItem("userId");
               window.location.href = "/#/login";
             }}
             className="text-white hover:text-red-100"
@@ -64,7 +71,7 @@ export const EscolaSideBar = () => {
       className="fixed inset-y-0 left-0 z-20 hidden w-60 transform overflow-y-auto border-r border-slate-100 bg-white p-4 shadow-xl transition duration-300 ease-in-out lg:flex lg:flex-col lg:pt-20"
     >
       <div className="flex flex-col gap-2">
-        {/* Página inicial da escola (lista de estudantes) */}
+        {/* Página inicial da escola */}
         <NavLink to="/home" className={linkClasses}>
           <MdOutlineDashboard className="w-5 h-5" /> Página inicial
         </NavLink>
@@ -78,7 +85,7 @@ export const EscolaSideBar = () => {
   );
 };
 
-/* ============== Layout completo (Header + SideBar + Conteúdo) ============== */
+/* ============== Layout completo ============== */
 const EscolaLayout = () => {
   return (
     <div className="min-h-screen bg-slate-50">
