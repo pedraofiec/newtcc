@@ -1,13 +1,14 @@
 // src/features/cadastro/components/RegisterResponsible.jsx
 import React from 'react';
 import { FaUser, FaPlus } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // 1. Importar useNavigate
 import './Register.css';
 
-// 🚀 CORREÇÃO DO CAMINHO DE IMPORTAÇÃO
 import RegisterService from '../service/RegisterService'; 
 
-// ⚠️ Recebe goToLogin como prop
-const RegisterResponsible = ({ goToLogin }) => {
+const RegisterResponsible = () => { // Removemos a obrigatoriedade da prop goToLogin
+  const navigate = useNavigate(); // 2. Instanciar o hook
+  
   const [nomeResponsavel, setNomeResponsavel] = React.useState('');
   const [cpfResponsavel, setCpfResponsavel] = React.useState('');
   const [enderecoCasa, setEnderecoCasa] = React.useState('');
@@ -34,7 +35,9 @@ const RegisterResponsible = ({ goToLogin }) => {
       await RegisterService.registerResponsible(data);
       
       alert('Cadastro de Responsável realizado com sucesso! Faça login para continuar.');
-      if (goToLogin) goToLogin();
+      
+      // 3. Redirecionar para o Login
+      navigate('/login'); 
 
     } catch (err) {
       setError(err.message);
@@ -107,15 +110,14 @@ const RegisterResponsible = ({ goToLogin }) => {
           >
             {loading ? 'Cadastrando...' : 'Criar conta'}
           </button>
-          {goToLogin && (
-              <button 
-                  type="button" 
-                  onClick={goToLogin}
-                  className="w-full py-3 mt-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition duration-300"
-              >
-                  Já tem conta? Fazer Login
-              </button>
-          )}
+          
+          <button 
+              type="button" 
+              onClick={() => navigate('/login')} // 4. Navegação manual no clique
+              className="w-full py-3 mt-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition duration-300"
+          >
+              Já tem conta? Fazer Login
+          </button>
         </form>
       </div>
     </div>
