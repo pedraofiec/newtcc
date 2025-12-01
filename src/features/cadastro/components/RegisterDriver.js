@@ -1,13 +1,13 @@
 // src/features/cadastro/components/RegisterDriver.jsx
 import React from 'react';
-import { FaUser, FaBus, FaPlus } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom'; // 1. Importar useNavigate
+import { FaUser, FaBus, FaPlus, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import './Register.css';
 
 import RegisterService from '../service/RegisterService';
 
 const RegisterDriver = () => {
-  const navigate = useNavigate(); // 2. Instanciar hook
+  const navigate = useNavigate();
 
   const [nomeMotorista, setNomeMotorista] = React.useState('');
   const [cnh, setCnh] = React.useState('');
@@ -27,26 +27,12 @@ const RegisterDriver = () => {
     setError('');
     setLoading(true);
 
-    const data = { 
-      nomeMotorista, 
-      cnh, 
-      cpf,
-      phone, 
-      email, 
-      password,
-      endereco,
-      placaVeiculo,
-      valCnh
-    };
+    const data = { nomeMotorista, cnh, cpf, phone, email, password, endereco, placaVeiculo, valCnh };
 
     try {
       await RegisterService.registerDriver(data);
-      
       alert('Cadastro de Motorista realizado com sucesso! Faça login para continuar.');
-      
-      // 3. Redirecionar
       navigate('/login');
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -56,8 +42,18 @@ const RegisterDriver = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#4DD0E1] from-0% to-white-500 to-50% p-4 relative overflow-hidden">
-      <div className="flex flex-col items-center justify-center p-8 bg-white rounded-2xl shadow-2xl mt-16 form-container is-visible">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800">CADASTRO DE MOTORISTA</h2>
+      <div className="flex flex-col items-center justify-center p-8 bg-white rounded-2xl shadow-2xl mt-16 form-container is-visible relative">
+        
+        {/* ✅ BOTÃO VOLTAR CORRIGIDO */}
+        <button 
+          type="button" 
+          onClick={() => navigate(-1)} // Volta para a tela anterior
+          className="absolute top-5 left-5 text-gray-400 hover:text-[#4DD0E1] transition-colors flex items-center gap-2 font-medium text-sm"
+        >
+          <FaArrowLeft /> Voltar
+        </button>
+
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800 mt-6">CADASTRO DE MOTORISTA</h2>
         <div className="relative mb-6">
           <FaBus className="text-8xl text-gray-800 opacity-70" />
           <FaPlus className="absolute bottom-0 right-0 text-3xl text-[#4DD0E1] bg-white rounded-full p-1" />
@@ -70,78 +66,15 @@ const RegisterDriver = () => {
         )}
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full">
-          <input
-            type="text"
-            placeholder="Nome Completo"
-            value={nomeMotorista}
-            onChange={(e) => setNomeMotorista(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="text"
-            placeholder="CPF"
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="text"
-            placeholder="CNH"
-            value={cnh}
-            onChange={(e) => setCnh(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Telefone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Endereço Casa"
-            value={endereco}
-            onChange={(e) => setEndereco(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Validade CNH (2025-11-08)"
-            value={valCnh}
-            onChange={(e) => setValCnh(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Placa Do Veiculo"
-            value={placaVeiculo}
-            onChange={(e) => setPlacaVeiculo(e.target.value)}
-            className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500"
-            required
-          />
+          <input type="text" placeholder="Nome Completo" value={nomeMotorista} onChange={(e) => setNomeMotorista(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="text" placeholder="Nome CPF" value={cpf} onChange={(e) => setCpf(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="text" placeholder="CNH" value={cnh} onChange={(e) => setCnh(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="tel" placeholder="Telefone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="text" placeholder="Endereço Casa" value={endereco} onChange={(e) => setEndereco(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="text" placeholder="Validade CNH (2025-11-08)" value={valCnh} onChange={(e) => setValCnh(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
+          <input type="text" placeholder="Placa Do Veiculo" value={placaVeiculo} onChange={(e) => setPlacaVeiculo(e.target.value)} className="w-full p-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 bg-gray-200 placeholder-gray-500" required />
           
           <button
             type="submit"
@@ -153,7 +86,7 @@ const RegisterDriver = () => {
 
           <button 
               type="button" 
-              onClick={() => navigate('/login')} // 4. Navegação manual
+              onClick={() => navigate('/login')}
               className="w-full py-3 mt-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition duration-300"
           >
               Já tem conta? Fazer Login
