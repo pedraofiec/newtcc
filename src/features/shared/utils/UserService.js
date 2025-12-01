@@ -3,6 +3,10 @@ import { jwtDecode } from "jwt-decode";
 
 /**
  * Retorna dados do usuário logado lendo apenas o JWT.
+ * Garante:
+ *  - userId  -> id do usuário (ou sub)
+ *  - id      -> mesmo valor de userId (pra compatibilidade)
+ *  - email   -> cai para 'sub' se não existir 'email'
  */
 export async function getMe() {
   const token = localStorage.getItem("accessToken");
@@ -14,21 +18,33 @@ export async function getMe() {
   try {
     const decoded = jwtDecode(token);
 
+    // id base (userId, id ou sub)
+    const baseId =
+      decoded.userId ||
+      decoded.id ||
+      decoded.sub ||
+      "";
+
     return {
-      id:
-        decoded.userId ||
-        decoded.id ||
-        decoded.sub || // << geralmente o correto
-        "",
+      // para telas novas
+      userId: baseId,
+      // para telas antigas que ainda usam "id"
+      id: baseId,
+
       nome:
         decoded.nome ||
         decoded.name ||
         decoded.nomeResponsavel ||
+        decoded.nomeMotorista ||
         "",
+
+      // 👇 AQUI ESTÁ O PULO DO GATO: cai para 'sub' se não tiver 'email'
       email:
         decoded.email ||
         decoded.username ||
+        decoded.sub ||
         "",
+
       role:
         decoded.role ||
         decoded.tipo ||

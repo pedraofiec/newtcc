@@ -16,7 +16,7 @@ const EditProfileScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
-  // campos só exibição
+  // somente leitura
   const [cnh, setCnh] = useState("");
   const [valCnh, setValCnh] = useState("");
   const [userId, setUserId] = useState("");
@@ -26,36 +26,45 @@ const EditProfileScreen = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  // 🔹 carrega dados do usuário logado ao abrir a tela
+  /**
+   * 🔹 Carrega os dados iniciais do motorista logado
+   */
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoadingProfile(true);
         setError(null);
 
-        // 1) dados básicos a partir do token (getMe -> JWT decodificado)
+        // 1) Info básica do usuário (via token)
         const me = await getMe();
-        // me = { userId, nome, email, role, ... }
+        // me: { userId, id, nome, email, role }
 
-        // 2) busca todos os motoristas no backend
+        // 2) Lista todos os motoristas da API
         const motoristas = await listarMotoristas();
 
-        // 3) tenta achar o motorista correspondente ao usuário logado
+        // Normaliza e-mail pra evitar diferença de case
+        const meEmail = me.email ? me.email.toLowerCase() : "";
+
+        // 3) Tenta achar o motorista logado
         const motorista = motoristas.find((m) => {
-          return m.userId === me.userId || m.email === me.email;
+          const motEmail = m.email ? m.email.toLowerCase() : "";
+          return (
+            motEmail === meEmail ||
+            m.userId === me.userId ||
+            m.userId === me.id ||
+            m.id === me.userId ||
+            m.id === me.id
+          );
         });
 
-        // 4) monta o perfil com o máximo de dados possível
+        // 4) Monta o perfil com máximo de dados possíveis
         const perfil = {
-          userId: me.userId,
-          name:
-            (motorista && (motorista.nomeMotorista || motorista.nome)) ||
-            me.nome ||
-            "",
-          email: me.email || (motorista && motorista.email) || "",
-          role: me.role || "MOTORISTA",
-          cnh: (motorista && motorista.cnh) || "",
-          valCnh: (motorista && motorista.valCnh) || "",
+          userId: me.userId || me.id || "",
+          name: motorista?.nomeMotorista || motorista?.nome || me.nome || "",
+          email: motorista?.email || me.email || "",
+          role: "Motorista",
+          cnh: motorista?.cnh || "",
+          valCnh: motorista?.valCnh || "",
         };
 
         setProfile(perfil);
@@ -64,6 +73,15 @@ const EditProfileScreen = () => {
         setEmail(perfil.email);
         setCnh(perfil.cnh);
         setValCnh(perfil.valCnh);
+
+        // (opcional) log pra diagnosticar se ainda não casar
+        if (!motorista) {
+          console.warn(
+            "[EditProfileScreen] Nenhum motorista encontrado para o usuário:",
+            me,
+            motoristas
+          );
+        }
       } catch (err) {
         console.error(err);
         setError("Não foi possível carregar os dados do motorista.");
@@ -75,50 +93,42 @@ const EditProfileScreen = () => {
     fetchProfile();
   }, []);
 
-  // 🔹 por enquanto NÃO existe PUT de motorista no back,
-  // então só atualizamos o estado local e avisamos o usuário
+  /**
+   * 🔹 Atualização local (não existe PUT de motorista ainda)
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
     setSuccess(false);
+    setError(null);
 
-    // atualiza apenas o state local (pra refletir na tela)
-    const perfilAtualizado = {
+    const atualizado = {
       userId,
       name,
       email,
       cnh,
       valCnh,
-      role: profile?.role || "MOTORISTA",
+      role: profile?.role || "Motorista",
     };
 
-    setProfile(perfilAtualizado);
-    setSuccess(true);
+    setProfile(atualizado);
     setLoading(false);
     setIsEditing(false);
-
-    console.warn(
-      "Ainda não existe endpoint de atualização de motorista no backend (PUT /motoristas)."
-    );
+    setSuccess(true);
   };
 
   const handleCancelEdit = () => {
     if (profile) {
       setName(profile.name);
       setEmail(profile.email);
-      setCnh(profile.cnh);
-      setValCnh(profile.valCnh);
-      setUserId(profile.userId);
     }
     setIsEditing(false);
-    setError(null);
   };
 
   return (
     <div className="w-full flex flex-col items-center font-sans">
-      <div className="w-full max-w-3xl mt-6 px-4 md:px-0">
-        {/* topo – link de voltar + título */}
+      <div className="w-full max-w-4xl mt-8 px-4 md:px-0">
+        {/* botão voltar */}
         <button
           onClick={() => navigate("/home")}
           className="flex items-center text-blue-600 hover:text-blue-800 mb-6 font-medium"
@@ -128,23 +138,23 @@ const EditProfileScreen = () => {
 
         <div className="flex items-center gap-2 mb-1">
           <FaUser className="text-2xl text-[#8AD7E1]" />
-          <h1 className="text-2xl md:text-3xl font-semibold text-slate-800">
+          <h1 className="text-3xl font-semibold text-slate-800">
             {isEditing ? "Editar Perfil" : "Meu Perfil"}
           </h1>
         </div>
+
         <p className="text-sm text-slate-500 mb-4">
           {isEditing
-            ? "Atualize seus dados pessoais utilizados na plataforma (apenas localmente, ainda sem salvar no servidor)."
+            ? "Atualize seus dados pessoais (atualização local, ainda sem salvar no servidor)."
             : "Veja suas informações cadastradas na plataforma."}
         </p>
-        <hr className="border-slate-200 mb-5" />
 
-        {/* card principal */}
-        <div className="bg-white rounded-3xl shadow-md p-5 md:p-7">
+        {/* CARD PRINCIPAL */}
+        <div className="bg-white rounded-3xl shadow-md p-8">
           {loadingProfile && (
-            <div className="text-sm text-slate-600 mb-3">
+            <p className="text-sm text-slate-600 mb-3">
               Carregando dados do motorista...
-            </div>
+            </p>
           )}
 
           {error && (
@@ -155,29 +165,24 @@ const EditProfileScreen = () => {
           {success && (
             <div className="p-3 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
               Perfil atualizado localmente!
-              <br />
-              (quando existir endpoint de atualização no back, vamos salvar lá
-              também 😉)
             </div>
           )}
 
-          {/* ===================== MODO VISUALIZAÇÃO ===================== */}
+          {/* ================= VISUALIZAÇÃO ================= */}
           {!isEditing && profile && !loadingProfile && (
             <div className="flex flex-col items-center gap-6">
-              {/* Avatar + nome */}
               <div className="flex flex-col items-center gap-3">
-                <div className="w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center">
-                  <span className="text-3xl text-sky-700">👤</span>
+                <div className="w-24 h-24 rounded-full bg-sky-100 flex items-center justify-center">
+                  <span className="text-4xl text-sky-700">👤</span>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-semibold text-gray-800">
+                  <p className="text-xl font-semibold text-gray-800">
                     {profile.name}
                   </p>
                   <p className="text-sm text-gray-500">{profile.role}</p>
                 </div>
               </div>
 
-              {/* Informações em cards */}
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoField label="Nome completo" value={profile.name} />
                 <InfoField label="E-mail" value={profile.email} />
@@ -188,7 +193,6 @@ const EditProfileScreen = () => {
                 />
               </div>
 
-              {/* Botão Editar perfil */}
               <button
                 onClick={() => {
                   setIsEditing(true);
@@ -202,7 +206,7 @@ const EditProfileScreen = () => {
             </div>
           )}
 
-          {/* ===================== MODO EDIÇÃO ===================== */}
+          {/* ================= EDIÇÃO ================= */}
           {isEditing && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <FormInput
@@ -211,7 +215,6 @@ const EditProfileScreen = () => {
                 type="text"
                 value={name}
                 onChange={setName}
-                required
               />
 
               <FormInput
@@ -220,10 +223,8 @@ const EditProfileScreen = () => {
                 type="email"
                 value={email}
                 onChange={setEmail}
-                required
               />
 
-              {/* CNH e validade só leitura por enquanto */}
               <InfoField label="CNH (somente leitura)" value={cnh || "-"} />
               <InfoField
                 label="Validade da CNH (somente leitura)"
@@ -282,9 +283,9 @@ function InfoField({ label, value }) {
   );
 }
 
-function FormInput({ id, label, type, value, onChange, required }) {
+function FormInput({ id, label, type, value, onChange }) {
   return (
-    <div>
+    <div className="flex flex-col">
       <label
         htmlFor={id}
         className="block text-xs font-semibold text-slate-600 mb-1"
@@ -296,7 +297,6 @@ function FormInput({ id, label, type, value, onChange, required }) {
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        required={required}
         className="mt-1 block w-full border border-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[#8AD7E1] focus:border-[#8AD7E1] outline-none"
       />
     </div>
