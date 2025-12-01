@@ -1,12 +1,14 @@
 // src/features/cadastro/components/RegisterSchool.js
 import React from 'react';
 import { FaBuilding, FaPlus } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // 1. Importar useNavigate
 import './Register.css';
 
-// 🚀 CORREÇÃO DO CAMINHO DE IMPORTAÇÃO
 import RegisterService from '../service/RegisterService'; 
 
-const RegisterSchool = ({ goToLogin }) => {
+const RegisterSchool = () => {
+  const navigate = useNavigate(); // 2. Instanciar hook
+
   const [nome, setNome] = React.useState('');
   const [cnpj, setCnpj] = React.useState('');
   const [endereco, setEndereco] = React.useState('');
@@ -21,19 +23,23 @@ const RegisterSchool = ({ goToLogin }) => {
     setError('');
     setLoading(true);
 
+    // 💡 CORREÇÃO: Adicionei o telefone que estava faltando no seu código original
     const data = { 
         nome, 
         cnpj, 
         endereco, 
         email, 
-        senha 
+        senha,
+        telefone 
     };
 
     try {
       await RegisterService.registerSchool(data);
       
       alert('Cadastro de Escola realizado com sucesso! Faça login para continuar.');
-      if (goToLogin) goToLogin();
+      
+      // 3. Redirecionar
+      navigate('/login');
 
     } catch (err) {
       setError(err.message);
@@ -116,15 +122,13 @@ const RegisterSchool = ({ goToLogin }) => {
             {loading ? 'Cadastrando...' : 'Criar conta'}
           </button>
 
-          {goToLogin && (
-            <button
+          <button
               type="button"
-              onClick={goToLogin}
+              onClick={() => navigate('/login')} // 4. Navegação manual
               className="w-full py-3 mt-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition duration-300"
             >
               Já tem conta? Fazer Login
             </button>
-          )}
         </form>
       </div>
     </div>
